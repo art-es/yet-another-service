@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"net/url"
 
 	domain_activate "github.com/art-es/yet-another-service/internal/domain/auth/activate"
 	domain_login "github.com/art-es/yet-another-service/internal/domain/auth/login"
@@ -12,6 +13,7 @@ import (
 	driver_gin "github.com/art-es/yet-another-service/internal/driver/gin"
 	driver_jwt "github.com/art-es/yet-another-service/internal/driver/jwt"
 	driver_postgres "github.com/art-es/yet-another-service/internal/driver/postgres"
+	driver_smtp "github.com/art-es/yet-another-service/internal/driver/smtp"
 	driver_validator "github.com/art-es/yet-another-service/internal/driver/validator"
 	driver_zerolog "github.com/art-es/yet-another-service/internal/driver/zerolog"
 	storage_postgres "github.com/art-es/yet-another-service/internal/storage/postgres"
@@ -30,6 +32,7 @@ func main() {
 	hashService := driver_bcrypt.NewHashService()
 	pgDB := driver_postgres.Connect("")
 	jwtService := driver_jwt.NewService("")
+	smtpService := driver_smtp.NewService(driver_smtp.Config{})
 
 	// Data Layer
 	userStorage := storage_postgres.NewUserStorage(pgDB)
@@ -37,7 +40,7 @@ func main() {
 	authTokenBlackListStorage := storage_redis.NewAuthTokenBlackListStorage()
 
 	// App Layer
-	signupService := domain_signup.NewService(hashService, userStorage, userActivationStorage)
+	signupService := domain_signup.NewService(url.URL{}, hashService, userStorage, userActivationStorage, smtpService)
 	activateService := domain_activate.NewService(userActivationStorage, userStorage)
 	loginService := domain_login.NewService(userStorage, hashService, jwtService)
 	logoutService := domain_logout.NewService(jwtService, authTokenBlackListStorage, logger)

@@ -3,6 +3,7 @@ package signup
 import (
 	"context"
 	"errors"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,6 +19,7 @@ func TestService(t *testing.T) {
 		hashGenerator     *mock.MockhashGenerator
 		userRepository    *mock.MockuserRepository
 		activationCreator *mock.MockactivationCreator
+		mailSender        *mock.MockmailSender
 	}
 
 	for _, tt := range []struct {
@@ -113,10 +115,53 @@ func TestService(t *testing.T) {
 
 				m.activationCreator.EXPECT().
 					Create(gomock.Any(), gomock.Not(nil), gomock.Eq("dummy user id")).
-					Return(errors.New("dummy error"))
+					Return(nil, errors.New("dummy error"))
 			},
 			assert: func(t *testing.T, err error) {
 				assert.EqualError(t, err, "create activation: dummy error")
+			},
+		},
+		{
+			name: "send activation mail error",
+			setup: func(t *testing.T, m mocks) {
+				m.userRepository.EXPECT().
+					EmailExists(gomock.Any(), gomock.Eq("iivan@example.com")).
+					Return(false, nil)
+
+				m.hashGenerator.EXPECT().
+					Generate(gomock.Eq("secret123")).
+					Return("dummy password hash", nil)
+
+				expUser := &auth.User{
+					Name:         "Ivanov Ivan",
+					Email:        "iivan@example.com",
+					PasswordHash: "dummy password hash",
+				}
+
+				m.userRepository.EXPECT().
+					Add(gomock.Any(), gomock.Not(nil), gomock.Eq(expUser)).
+					Do(func(_ context.Context, tx transaction.Transaction, user *auth.User) {
+						user.ID = "dummy user id"
+					}).
+					Return(nil)
+
+				activation := &auth.Activation{
+					Token:  "dummy_token",
+					UserID: "dummy user id",
+				}
+
+				m.activationCreator.EXPECT().
+					Create(gomock.Any(), gomock.Not(nil), gomock.Eq("dummy user id")).
+					Return(activation, nil)
+
+				expActivationMailContent := "<!DOCTYPE html>\n<html>\n<body>\n    <p>To activate your account follow by link http://localhost:8080/foo?bar=1&token=dummy_token</p>\n</body>\n</html>"
+
+				m.mailSender.EXPECT().
+					SendMail(gomock.Eq("iivan@example.com"), gomock.Eq(activationMailSubject), gomock.Eq(expActivationMailContent)).
+					Return(errors.New("dummy error"))
+			},
+			assert: func(t *testing.T, err error) {
+				assert.EqualError(t, err, "send activation mail: dummy error")
 			},
 		},
 		{
@@ -147,10 +192,20 @@ func TestService(t *testing.T) {
 					}).
 					Return(nil)
 
+				activation := &auth.Activation{
+					Token:  "dummy_token",
+					UserID: "dummy user id",
+				}
+
 				m.activationCreator.EXPECT().
 					Create(gomock.Any(), gomock.Not(nil), gomock.Eq("dummy user id")).
-					Return(nil)
+					Return(activation, nil)
 
+				expActivationMailContent := "<!DOCTYPE html>\n<html>\n<body>\n    <p>To activate your account follow by link http://localhost:8080/foo?bar=1&token=dummy_token</p>\n</body>\n</html>"
+
+				m.mailSender.EXPECT().
+					SendMail(gomock.Eq("iivan@example.com"), gomock.Eq(activationMailSubject), gomock.Eq(expActivationMailContent)).
+					Return(nil)
 			},
 			assert: func(t *testing.T, err error) {
 				assert.EqualError(t, err, "commit transaction: dummy error")
@@ -180,8 +235,19 @@ func TestService(t *testing.T) {
 					}).
 					Return(nil)
 
+				activation := &auth.Activation{
+					Token:  "dummy_token",
+					UserID: "dummy user id",
+				}
+
 				m.activationCreator.EXPECT().
 					Create(gomock.Any(), gomock.Not(nil), gomock.Eq("dummy user id")).
+					Return(activation, nil)
+
+				expActivationMailContent := "<!DOCTYPE html>\n<html>\n<body>\n    <p>To activate your account follow by link http://localhost:8080/foo?bar=1&token=dummy_token</p>\n</body>\n</html>"
+
+				m.mailSender.EXPECT().
+					SendMail(gomock.Eq("iivan@example.com"), gomock.Eq(activationMailSubject), gomock.Eq(expActivationMailContent)).
 					Return(nil)
 			},
 			assert: func(t *testing.T, err error) {
@@ -197,14 +263,18 @@ func TestService(t *testing.T) {
 				hashGenerator:     mock.NewMockhashGenerator(ctrl),
 				userRepository:    mock.NewMockuserRepository(ctrl),
 				activationCreator: mock.NewMockactivationCreator(ctrl),
+				mailSender:        mock.NewMockmailSender(ctrl),
 			}
 
 			if tt.setup != nil {
 				tt.setup(t, m)
 			}
 
-			service := NewService(m.hashGenerator, m.userRepository, m.activationCreator)
-			err := service.Signup(context.Background(), &auth.SignupRequest{
+			activationURL, err := url.Parse("http://localhost:8080/foo?bar=1")
+			assert.NoError(t, err)
+
+			service := NewService(*activationURL, m.hashGenerator, m.userRepository, m.activationCreator, m.mailSender)
+			err = service.Signup(context.Background(), &auth.SignupRequest{
 				Name:     "Ivanov Ivan",
 				Email:    "iivan@example.com",
 				Password: "secret123",

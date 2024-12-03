@@ -20,19 +20,22 @@ func NewUserActivationStorage(db *sql.DB) *UserActivationStorage {
 	}
 }
 
-func (s *UserActivationStorage) Create(ctx context.Context, tx transaction.Transaction, userID string) error {
+func (s *UserActivationStorage) Create(ctx context.Context, tx transaction.Transaction, userID string) (*auth.Activation, error) {
 	sqlTx, err := getSQLTxOrBegin(tx, s.db)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	const query = "INSERT INTO user_activations (user_id) VALUES ($1)"
+	const query = "INSERT INTO user_activations (user_id) VALUES ($1) RETURNING (token, user_id)"
 
-	if _, err = sqlTx.ExecContext(ctx, query, userID); err != nil {
-		return fmt.Errorf("execute query: %w", err)
+	activation := &auth.Activation{}
+	err = sqlTx.QueryRowContext(ctx, query, userID).
+		Scan(&activation.Token, &activation.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("execute query: %w", err)
 	}
 
-	return nil
+	return activation, nil
 }
 
 func (s *UserActivationStorage) Delete(ctx context.Context, tx transaction.Transaction, token string) error {

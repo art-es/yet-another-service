@@ -69,7 +69,7 @@ func (s *UserStorage) Activate(ctx context.Context, tx transaction.Transaction, 
 		return err
 	}
 
-	const query = "UPDATE users SET activated_at=CURRENT_TIMESTAMP WHERE id=$1"
+	const query = "UPDATE users SET activated_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP WHERE id=$1"
 
 	if _, err = sqlTx.ExecContext(ctx, query, userID); err != nil {
 		return fmt.Errorf("execute query: %w", err)

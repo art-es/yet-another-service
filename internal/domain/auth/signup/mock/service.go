@@ -135,15 +135,54 @@ func (m *MockactivationCreator) EXPECT() *MockactivationCreatorMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockactivationCreator) Create(ctx context.Context, tx transaction.Transaction, userID string) error {
+func (m *MockactivationCreator) Create(ctx context.Context, tx transaction.Transaction, userID string) (*auth.Activation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, tx, userID)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*auth.Activation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
 func (mr *MockactivationCreatorMockRecorder) Create(ctx, tx, userID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockactivationCreator)(nil).Create), ctx, tx, userID)
+}
+
+// MockmailSender is a mock of mailSender interface.
+type MockmailSender struct {
+	ctrl     *gomock.Controller
+	recorder *MockmailSenderMockRecorder
+	isgomock struct{}
+}
+
+// MockmailSenderMockRecorder is the mock recorder for MockmailSender.
+type MockmailSenderMockRecorder struct {
+	mock *MockmailSender
+}
+
+// NewMockmailSender creates a new mock instance.
+func NewMockmailSender(ctrl *gomock.Controller) *MockmailSender {
+	mock := &MockmailSender{ctrl: ctrl}
+	mock.recorder = &MockmailSenderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockmailSender) EXPECT() *MockmailSenderMockRecorder {
+	return m.recorder
+}
+
+// SendMail mocks base method.
+func (m *MockmailSender) SendMail(address, subject, content string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendMail", address, subject, content)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendMail indicates an expected call of SendMail.
+func (mr *MockmailSenderMockRecorder) SendMail(address, subject, content any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMail", reflect.TypeOf((*MockmailSender)(nil).SendMail), address, subject, content)
 }

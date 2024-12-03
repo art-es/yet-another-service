@@ -1,0 +1,188 @@
+openapi: 3.0.3
+info:
+  title: Yet Another Service API
+  version: 1.0.0
+paths:
+  /auth/signup:
+    post:
+      summary: Allows users to register a new account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                  example: Ivanov Ivan
+                email:
+                  type: string
+                  example: iivan@example.com
+                password:
+                  type: string
+                  example: secret123
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+  /auth/activate:
+    get:
+      summary: Activates a user account by verifying a token provided in the email link.
+      parameters:
+        - name: token
+          in: query
+          description: A token for activation account.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: OK
+  /auth/login:
+    post:
+      summary: Authenticates users and generates an access token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: iivan@example.com
+                password:
+                  type: string
+                  example: secret123
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - accessToken
+                  - refreshToken
+                  - tokenType
+                properties:
+                  accessToken:
+                    type: string
+                    example: eyJz93a...k4laUWw
+                  refreshToken:
+                    type: string
+                    example: GEbRxBN...edjnXbL
+                  tokenType:
+                    type: string
+                    example: Bearer
+  /auth/logout:
+    post:
+      summary: Logs users out by invalidating their access and refresh tokens.
+      parameters:
+        - name: Authorization
+          in: header
+          description: Contains the access token that will be used for invalidation.
+          example: Bearer eyJz93a...k4laUWw
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  description: Contains the refresh token that will be used for invalidation.
+                  example: Bearer GEbRxBN...edjnXbL
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+  /auth/refresh:
+    post:
+      summary: Refreshes the access token using a valid refresh token.
+      parameters:
+        - name: Authorization
+          in: header
+          description: Contains the authorization token (refresh token) that will be used for generation new access token.
+          example: Bearer GEbRxBN...edjnXbL
+          required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - accessToken
+                properties:
+                  accessToken:
+                    type: string
+  /auth/forgot-password:
+    post:
+      summary: Initiates the password recovery process by sending a reset link or code.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: iivan@example.com
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+  /auth/recover-password:
+    post:
+      summary: Recovers the user's password using a token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: A token for reseting password.
+                  format: uuid
+                oldPassword:
+                  type: string
+                  example: revealedPassword123
+                newPassword:
+                  type: string
+                  example: secretPassword123
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object

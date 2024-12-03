@@ -1,0 +1,81 @@
+//go:generate mockgen -source=handler.go -destination=mock/handler.go -package=mock
+package logout
+
+import (
+	"context"
+	"errors"
+	nethttp "net/http"
+
+	"github.com/art-es/yet-another-service/internal/core/http"
+	"github.com/art-es/yet-another-service/internal/core/log"
+	"github.com/art-es/yet-another-service/internal/core/validation"
+	"github.com/art-es/yet-another-service/internal/domain/auth"
+)
+
+type authService interface {
+	Logout(ctx context.Context, req *auth.LogoutRequest) error
+}
+
+type request struct {
+	AccessToken  *string `json:"-" validate:"omitnil,len=70"`
+	RefreshToken string  `json:"refreshToken" validate:"required,len=70"`
+}
+
+type Handler struct {
+	authService authService
+	logger      log.Logger
+	validator   validation.Validator
+}
+
+func NewHandler(
+	authService authService,
+	logger log.Logger,
+	validator validation.Validator,
+) *Handler {
+	return &Handler{
+		authService: authService,
+		logger:      logger,
+		validator:   validator,
+	}
+}
+
+func (h *Handler) Handle(ctx http.Context) {
+	req, err := h.parseRequest(ctx)
+	if err != nil {
+		http.RespondBadRequest(ctx, err.Error())
+		return
+	}
+
+	err = h.authService.Logout(ctx, &auth.LogoutRequest{
+		AccessToken:  req.AccessToken,
+		RefreshToken: req.RefreshToken,
+	})
+
+	switch {
+	case err == nil:
+		http.Respond(ctx, nethttp.StatusOK, struct{}{})
+	case errors.Is(err, auth.ErrInvalidToken):
+		http.RespondBadRequest(ctx, err.Error())
+	default:
+		h.logger.Error().Err(err).Msg("logout error on auth service")
+		http.RespondInternalError(ctx)
+	}
+}
+
+func (h *Handler) parseRequest(ctx http.Context) (*request, error) {
+	req := &request{}
+
+	if err := http.EnrichRequestBody(ctx, req); err != nil {
+		return nil, err
+	}
+
+	if accessToken, ok := http.GetAuthorizationToken(ctx); ok {
+		req.AccessToken = &accessToken
+	}
+
+	if err := h.validator.Struct(req); err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}

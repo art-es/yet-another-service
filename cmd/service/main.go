@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"net/url"
 
 	domain_activate "github.com/art-es/yet-another-service/internal/domain/auth/activate"
 	domain_login "github.com/art-es/yet-another-service/internal/domain/auth/login"
@@ -26,21 +25,23 @@ import (
 )
 
 func main() {
-	// Drivers
 	logger := driver_zerolog.NewLogger()
+	config := getAppConfig(logger)
+
+	// Drivers
 	validator := driver_validator.New()
 	hashService := driver_bcrypt.NewHashService()
-	pgDB := driver_postgres.Connect("")
-	jwtService := driver_jwt.NewService("")
-	smtpService := driver_smtp.NewService(driver_smtp.Config{})
+	postgresDB := driver_postgres.Connect(config.postgresURL)
+	jwtService := driver_jwt.NewService(config.jwtSecret)
+	smtpService := driver_smtp.NewService(config.smtpConfig)
 
 	// Data Layer
-	userStorage := storage_postgres.NewUserStorage(pgDB)
-	userActivationStorage := storage_postgres.NewUserActivationStorage(pgDB)
+	userStorage := storage_postgres.NewUserStorage(postgresDB)
+	userActivationStorage := storage_postgres.NewUserActivationStorage(postgresDB)
 	authTokenBlackListStorage := storage_redis.NewAuthTokenBlackListStorage()
 
 	// App Layer
-	signupService := domain_signup.NewService(url.URL{}, hashService, userStorage, userActivationStorage, smtpService)
+	signupService := domain_signup.NewService(config.userActivationURL, hashService, userStorage, userActivationStorage, smtpService)
 	activateService := domain_activate.NewService(userActivationStorage, userStorage)
 	loginService := domain_login.NewService(userStorage, hashService, jwtService)
 	logoutService := domain_logout.NewService(jwtService, authTokenBlackListStorage, logger)

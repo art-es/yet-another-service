@@ -29,8 +29,13 @@ type Service struct {
 }
 
 func NewService(config Config) *Service {
+	address := config.Host
+	if config.Port != 0 {
+		address = fmt.Sprintf("%s:%d", config.Host, config.Port)
+	}
+
 	return &Service{
-		address: fmt.Sprintf("%s:%d", config.Host, config.Port),
+		address: address,
 		auth:    smtp.PlainAuth(config.Identity, config.Username, config.Password, config.Host),
 		from:    config.Username,
 	}

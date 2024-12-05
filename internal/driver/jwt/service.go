@@ -49,7 +49,7 @@ func (s *Service) Parse(signedToken string) (*auth.TokenClaims, error) {
 		return s.secret, nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("parse token: %w", err)
+		return nil, auth.ErrInvalidToken
 	}
 
 	claims, ok := token.Claims.(*internalClaims)

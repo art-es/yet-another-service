@@ -7,13 +7,14 @@ import (
 	"time"
 
 	"github.com/art-es/yet-another-service/internal/domain/auth"
-	"github.com/art-es/yet-another-service/internal/domain/hash"
+	"github.com/art-es/yet-another-service/internal/domain/shared/errors"
+	"github.com/art-es/yet-another-service/internal/domain/shared/models"
 )
 
 var getCurrentTime = time.Now
 
 type userRepository interface {
-	FindByEmail(ctx context.Context, email string) (*auth.User, error)
+	FindByEmail(ctx context.Context, email string) (*models.User, error)
 }
 
 type hashChecker interface {
@@ -42,19 +43,19 @@ func NewService(
 	}
 }
 
-func (s *Service) Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResult, error) {
+func (s *Service) Login(ctx context.Context, req *auth.LoginIn) (*auth.LoginOut, error) {
 	user, err := s.userRepository.FindByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, fmt.Errorf("find user by email in repository: %w", err)
 	}
 
 	if user == nil {
-		return nil, auth.ErrUserNotFound
+		return nil, errors.ErrUserNotFound
 	}
 
 	if err = s.hashChecker.Check(req.Password, user.PasswordHash); err != nil {
-		if err == hash.ErrMismatched {
-			return nil, auth.ErrWrongPassword
+		if err == errors.ErrHashMismatched {
+			return nil, errors.ErrWrongPassword
 		}
 
 		return nil, fmt.Errorf("check password by hash: %w", err)
@@ -72,7 +73,7 @@ func (s *Service) Login(ctx context.Context, req *auth.LoginRequest) (*auth.Logi
 		return nil, fmt.Errorf("generate refresh token: %w", err)
 	}
 
-	return &auth.LoginResult{
+	return &auth.LoginOut{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil

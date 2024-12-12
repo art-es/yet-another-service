@@ -79,7 +79,7 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expAuthReq := &auth.SignupRequest{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
+				expAuthReq := &auth.SignupIn{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
 				authSvc.EXPECT().
 					Signup(gomock.Any(), gomock.Eq(expAuthReq)).
 					Return(errors.New("auth service dummy error"))
@@ -105,7 +105,7 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expAuthReq := &auth.SignupRequest{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
+				expAuthReq := &auth.SignupIn{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
 				authSvc.EXPECT().
 					Signup(gomock.Any(), gomock.Eq(expAuthReq)).
 					Return(nil)

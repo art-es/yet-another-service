@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/art-es/yet-another-service/internal/core/mail"
 	domain_activate "github.com/art-es/yet-another-service/internal/domain/auth/activate"
 	domain_login "github.com/art-es/yet-another-service/internal/domain/auth/login"
 	domain_logout "github.com/art-es/yet-another-service/internal/domain/auth/logout"
@@ -40,8 +41,11 @@ func main() {
 	userActivationStorage := storage_postgres.NewUserActivationStorage(postgresDB)
 	authTokenBlackListStorage := storage_redis.NewAuthTokenBlackListStorage()
 
+	// Mailers
+	userActivationMailer := mail.NewUserActivationMailer(smtpService)
+
 	// App Layer
-	signupService := domain_signup.NewService(config.userActivationURL, hashService, userStorage, userActivationStorage, smtpService)
+	signupService := domain_signup.NewService(config.userActivationURL, hashService, userStorage, userActivationStorage, userActivationMailer)
 	activateService := domain_activate.NewService(userActivationStorage, userStorage)
 	loginService := domain_login.NewService(userStorage, hashService, jwtService)
 	logoutService := domain_logout.NewService(jwtService, authTokenBlackListStorage, logger)

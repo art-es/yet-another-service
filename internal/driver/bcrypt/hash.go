@@ -3,7 +3,7 @@ package bcrypt
 import (
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/art-es/yet-another-service/internal/domain/hash"
+	"github.com/art-es/yet-another-service/internal/domain/shared/errors"
 )
 
 type HashService struct{}
@@ -25,7 +25,7 @@ func (s *HashService) Check(str, hashStr string) error {
 	}
 
 	if err == bcrypt.ErrMismatchedHashAndPassword {
-		return hash.ErrMismatched
+		return errors.ErrHashMismatched
 	}
 
 	return err

@@ -16,6 +16,7 @@ import (
 	mockhttp "github.com/art-es/yet-another-service/internal/core/http/mock"
 	mockvalidation "github.com/art-es/yet-another-service/internal/core/validation/mock"
 	"github.com/art-es/yet-another-service/internal/domain/auth"
+	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
 	"github.com/art-es/yet-another-service/internal/transport/handler/auth/logout/mock"
 	"github.com/art-es/yet-another-service/internal/util/pointer"
@@ -82,7 +83,7 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expAuthReq := &auth.LogoutRequest{RefreshToken: "dummy refresh token"}
+				expAuthReq := &auth.LogoutIn{RefreshToken: "dummy refresh token"}
 				authSvc.EXPECT().
 					Logout(gomock.Any(), gomock.Eq(expAuthReq)).
 					Return(errors.New("auth service dummy error"))
@@ -108,14 +109,14 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expAuthReq := &auth.LogoutRequest{RefreshToken: "dummy refresh token"}
+				expAuthReq := &auth.LogoutIn{RefreshToken: "dummy refresh token"}
 				authSvc.EXPECT().
 					Logout(gomock.Any(), gomock.Eq(expAuthReq)).
-					Return(auth.ErrInvalidToken)
+					Return(errorsd.ErrInvalidAuthToken)
 			},
 			assert: func(t *testing.T, res *httptest.ResponseRecorder, logs []string) {
 				assert.Equal(t, http.StatusBadRequest, res.Code)
-				expResBody := `{"message": "invalid token"}`
+				expResBody := `{"message": "invalid auth token"}`
 				assert.JSONEq(t, expResBody, res.Body.String())
 
 				assert.Len(t, logs, 0)
@@ -136,7 +137,7 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expAuthReq := &auth.LogoutRequest{
+				expAuthReq := &auth.LogoutIn{
 					AccessToken:  pointer.To("dummy access token"),
 					RefreshToken: "dummy refresh token",
 				}

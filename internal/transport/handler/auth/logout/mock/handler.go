@@ -42,7 +42,7 @@ func (m *MockauthService) EXPECT() *MockauthServiceMockRecorder {
 }
 
 // Logout mocks base method.
-func (m *MockauthService) Logout(ctx context.Context, req *auth.LogoutRequest) error {
+func (m *MockauthService) Logout(ctx context.Context, req *auth.LogoutIn) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Logout", ctx, req)
 	ret0, _ := ret[0].(error)

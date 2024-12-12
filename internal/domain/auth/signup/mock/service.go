@@ -13,8 +13,9 @@ import (
 	context "context"
 	reflect "reflect"
 
+	mail "github.com/art-es/yet-another-service/internal/core/mail"
 	transaction "github.com/art-es/yet-another-service/internal/core/transaction"
-	auth "github.com/art-es/yet-another-service/internal/domain/auth"
+	models "github.com/art-es/yet-another-service/internal/domain/shared/models"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -81,108 +82,107 @@ func (m *MockuserRepository) EXPECT() *MockuserRepositoryMockRecorder {
 	return m.recorder
 }
 
-// Add mocks base method.
-func (m *MockuserRepository) Add(ctx context.Context, tx transaction.Transaction, user *auth.User) error {
+// Exists mocks base method.
+func (m *MockuserRepository) Exists(ctx context.Context, email string) (bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Add", ctx, tx, user)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Add indicates an expected call of Add.
-func (mr *MockuserRepositoryMockRecorder) Add(ctx, tx, user any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add", reflect.TypeOf((*MockuserRepository)(nil).Add), ctx, tx, user)
-}
-
-// EmailExists mocks base method.
-func (m *MockuserRepository) EmailExists(ctx context.Context, email string) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EmailExists", ctx, email)
+	ret := m.ctrl.Call(m, "Exists", ctx, email)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// EmailExists indicates an expected call of EmailExists.
-func (mr *MockuserRepositoryMockRecorder) EmailExists(ctx, email any) *gomock.Call {
+// Exists indicates an expected call of Exists.
+func (mr *MockuserRepositoryMockRecorder) Exists(ctx, email any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EmailExists", reflect.TypeOf((*MockuserRepository)(nil).EmailExists), ctx, email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exists", reflect.TypeOf((*MockuserRepository)(nil).Exists), ctx, email)
 }
 
-// MockactivationCreator is a mock of activationCreator interface.
-type MockactivationCreator struct {
-	ctrl     *gomock.Controller
-	recorder *MockactivationCreatorMockRecorder
-	isgomock struct{}
-}
-
-// MockactivationCreatorMockRecorder is the mock recorder for MockactivationCreator.
-type MockactivationCreatorMockRecorder struct {
-	mock *MockactivationCreator
-}
-
-// NewMockactivationCreator creates a new mock instance.
-func NewMockactivationCreator(ctrl *gomock.Controller) *MockactivationCreator {
-	mock := &MockactivationCreator{ctrl: ctrl}
-	mock.recorder = &MockactivationCreatorMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockactivationCreator) EXPECT() *MockactivationCreatorMockRecorder {
-	return m.recorder
-}
-
-// Create mocks base method.
-func (m *MockactivationCreator) Create(ctx context.Context, tx transaction.Transaction, userID string) (*auth.Activation, error) {
+// Save mocks base method.
+func (m *MockuserRepository) Save(ctx context.Context, tx transaction.Transaction, user *models.User) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, tx, userID)
-	ret0, _ := ret[0].(*auth.Activation)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Create indicates an expected call of Create.
-func (mr *MockactivationCreatorMockRecorder) Create(ctx, tx, userID any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockactivationCreator)(nil).Create), ctx, tx, userID)
-}
-
-// MockmailSender is a mock of mailSender interface.
-type MockmailSender struct {
-	ctrl     *gomock.Controller
-	recorder *MockmailSenderMockRecorder
-	isgomock struct{}
-}
-
-// MockmailSenderMockRecorder is the mock recorder for MockmailSender.
-type MockmailSenderMockRecorder struct {
-	mock *MockmailSender
-}
-
-// NewMockmailSender creates a new mock instance.
-func NewMockmailSender(ctrl *gomock.Controller) *MockmailSender {
-	mock := &MockmailSender{ctrl: ctrl}
-	mock.recorder = &MockmailSenderMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockmailSender) EXPECT() *MockmailSenderMockRecorder {
-	return m.recorder
-}
-
-// SendMail mocks base method.
-func (m *MockmailSender) SendMail(address, subject, content string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SendMail", address, subject, content)
+	ret := m.ctrl.Call(m, "Save", ctx, tx, user)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SendMail indicates an expected call of SendMail.
-func (mr *MockmailSenderMockRecorder) SendMail(address, subject, content any) *gomock.Call {
+// Save indicates an expected call of Save.
+func (mr *MockuserRepositoryMockRecorder) Save(ctx, tx, user any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMail", reflect.TypeOf((*MockmailSender)(nil).SendMail), address, subject, content)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockuserRepository)(nil).Save), ctx, tx, user)
+}
+
+// MockactivationRepository is a mock of activationRepository interface.
+type MockactivationRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockactivationRepositoryMockRecorder
+	isgomock struct{}
+}
+
+// MockactivationRepositoryMockRecorder is the mock recorder for MockactivationRepository.
+type MockactivationRepositoryMockRecorder struct {
+	mock *MockactivationRepository
+}
+
+// NewMockactivationRepository creates a new mock instance.
+func NewMockactivationRepository(ctrl *gomock.Controller) *MockactivationRepository {
+	mock := &MockactivationRepository{ctrl: ctrl}
+	mock.recorder = &MockactivationRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockactivationRepository) EXPECT() *MockactivationRepositoryMockRecorder {
+	return m.recorder
+}
+
+// Save mocks base method.
+func (m *MockactivationRepository) Save(ctx context.Context, tx transaction.Transaction, activation *models.UserActivation) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Save", ctx, tx, activation)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Save indicates an expected call of Save.
+func (mr *MockactivationRepositoryMockRecorder) Save(ctx, tx, activation any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockactivationRepository)(nil).Save), ctx, tx, activation)
+}
+
+// MockactivationMailer is a mock of activationMailer interface.
+type MockactivationMailer struct {
+	ctrl     *gomock.Controller
+	recorder *MockactivationMailerMockRecorder
+	isgomock struct{}
+}
+
+// MockactivationMailerMockRecorder is the mock recorder for MockactivationMailer.
+type MockactivationMailerMockRecorder struct {
+	mock *MockactivationMailer
+}
+
+// NewMockactivationMailer creates a new mock instance.
+func NewMockactivationMailer(ctrl *gomock.Controller) *MockactivationMailer {
+	mock := &MockactivationMailer{ctrl: ctrl}
+	mock.recorder = &MockactivationMailerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockactivationMailer) EXPECT() *MockactivationMailerMockRecorder {
+	return m.recorder
+}
+
+// MailTo mocks base method.
+func (m *MockactivationMailer) MailTo(address string, data mail.UserActivationData) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MailTo", address, data)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// MailTo indicates an expected call of MailTo.
+func (mr *MockactivationMailerMockRecorder) MailTo(address, data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MailTo", reflect.TypeOf((*MockactivationMailer)(nil).MailTo), address, data)
 }

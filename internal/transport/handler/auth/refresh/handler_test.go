@@ -12,7 +12,7 @@ import (
 	"go.uber.org/mock/gomock"
 
 	mockhttp "github.com/art-es/yet-another-service/internal/core/http/mock"
-	"github.com/art-es/yet-another-service/internal/domain/auth"
+	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
 	"github.com/art-es/yet-another-service/internal/transport/handler/auth/refresh/mock"
 )
@@ -40,7 +40,7 @@ func TestHandler(t *testing.T) {
 
 				authSvc.EXPECT().
 					Refresh(gomock.Eq("dummy refresh token")).
-					Return("", auth.ErrInvalidToken)
+					Return("", errorsd.ErrInvalidAuthToken)
 			},
 			assert: func(t *testing.T, res *httptest.ResponseRecorder, logs []string) {
 				assert.Equal(t, http.StatusUnauthorized, res.Code)

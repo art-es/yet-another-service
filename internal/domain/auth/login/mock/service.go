@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	auth "github.com/art-es/yet-another-service/internal/domain/auth"
+	models "github.com/art-es/yet-another-service/internal/domain/shared/models"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,10 +43,10 @@ func (m *MockuserRepository) EXPECT() *MockuserRepositoryMockRecorder {
 }
 
 // FindByEmail mocks base method.
-func (m *MockuserRepository) FindByEmail(ctx context.Context, email string) (*auth.User, error) {
+func (m *MockuserRepository) FindByEmail(ctx context.Context, email string) (*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindByEmail", ctx, email)
-	ret0, _ := ret[0].(*auth.User)
+	ret0, _ := ret[0].(*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

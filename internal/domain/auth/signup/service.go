@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/art-es/yet-another-service/internal/core/mail"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 	"github.com/art-es/yet-another-service/internal/domain/auth"
+	"github.com/art-es/yet-another-service/internal/domain/shared/errors"
+	"github.com/art-es/yet-another-service/internal/domain/shared/models"
 )
 
 type hashGenerator interface {
@@ -15,66 +18,55 @@ type hashGenerator interface {
 }
 
 type userRepository interface {
-	Add(ctx context.Context, tx transaction.Transaction, user *auth.User) error
-	EmailExists(ctx context.Context, email string) (bool, error)
+	Exists(ctx context.Context, email string) (bool, error)
+	Save(ctx context.Context, tx transaction.Transaction, user *models.User) error
 }
 
-type activationCreator interface {
-	Create(ctx context.Context, tx transaction.Transaction, userID string) (*auth.Activation, error)
+type activationRepository interface {
+	Save(ctx context.Context, tx transaction.Transaction, activation *models.UserActivation) error
 }
 
-type mailSender interface {
-	SendMail(address string, subject, content string) error
+type activationMailer interface {
+	MailTo(address string, data mail.UserActivationData) error
 }
 
 type Service struct {
-	activationURL     url.URL
-	hashGenerator     hashGenerator
-	userRepository    userRepository
-	activationCreator activationCreator
-	mailSender        mailSender
+	baseActivationURL    url.URL
+	hashGenerator        hashGenerator
+	userRepository       userRepository
+	activationRepository activationRepository
+	activationMailer     activationMailer
 }
 
 func NewService(
 	activationURL url.URL,
 	hashGenerateService hashGenerator,
 	userRepository userRepository,
-	activationCreator activationCreator,
-	mailSender mailSender,
+	activationRepository activationRepository,
+	activationMailer activationMailer,
 ) *Service {
 	return &Service{
-		activationURL:     activationURL,
-		hashGenerator:     hashGenerateService,
-		userRepository:    userRepository,
-		activationCreator: activationCreator,
-		mailSender:        mailSender,
+		baseActivationURL:    activationURL,
+		hashGenerator:        hashGenerateService,
+		userRepository:       userRepository,
+		activationRepository: activationRepository,
+		activationMailer:     activationMailer,
 	}
 }
 
-func (s *Service) Signup(ctx context.Context, req *auth.SignupRequest) error {
-	emailExists, err := s.userRepository.EmailExists(ctx, req.Email)
+func (s *Service) Signup(ctx context.Context, in *auth.SignupIn) error {
+	userExists, err := s.userRepository.Exists(ctx, in.Email)
 	if err != nil {
-		return fmt.Errorf("check user email exists in repository: %w", err)
+		return fmt.Errorf("check user exists in repository: %w", err)
 	}
 
-	if emailExists {
-		return auth.ErrEmailAlreadyTaken
-	}
-
-	passwordHash, err := s.hashGenerator.Generate(req.Password)
-	if err != nil {
-		return fmt.Errorf("generate password hash: %w", err)
-	}
-
-	user := &auth.User{
-		Name:         req.Name,
-		Email:        req.Email,
-		PasswordHash: passwordHash,
+	if userExists {
+		return errors.ErrEmailAlreadyTaken
 	}
 
 	tx := transaction.New(ctx)
 
-	if err = s.doTransaction(ctx, tx, user); err != nil {
+	if err = s.doTransaction(ctx, tx, in); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -86,32 +78,44 @@ func (s *Service) Signup(ctx context.Context, req *auth.SignupRequest) error {
 	return nil
 }
 
-func (s *Service) doTransaction(ctx context.Context, tx transaction.Transaction, user *auth.User) error {
-	if err := s.userRepository.Add(ctx, tx, user); err != nil {
-		return fmt.Errorf("add user to repository: %w", err)
-	}
-
-	activation, err := s.activationCreator.Create(ctx, tx, user.ID)
+func (s *Service) doTransaction(ctx context.Context, tx transaction.Transaction, in *auth.SignupIn) error {
+	passwordHash, err := s.hashGenerator.Generate(in.Password)
 	if err != nil {
-		return fmt.Errorf("create activation: %w", err)
+		return fmt.Errorf("generate password hash: %w", err)
 	}
 
-	if err = s.sendActivationMail(user.Email, activation.Token); err != nil {
-		return err
+	user := &models.User{
+		Name:         in.Name,
+		Email:        in.Email,
+		PasswordHash: passwordHash,
+	}
+
+	if err = s.userRepository.Save(ctx, tx, user); err != nil {
+		return fmt.Errorf("save user in repository: %w", err)
+	}
+
+	activation := &models.UserActivation{
+		UserID: user.ID,
+	}
+
+	if err = s.activationRepository.Save(ctx, tx, activation); err != nil {
+		return fmt.Errorf("save activation in repository: %w", err)
+	}
+
+	activationMailData := mail.UserActivationData{
+		ActivationURL: newActivationURL(s.baseActivationURL, activation.Token),
+	}
+
+	if err = s.activationMailer.MailTo(user.Email, activationMailData); err != nil {
+		return fmt.Errorf("mail activation to user: %w", err)
 	}
 
 	return nil
 }
 
-func (s *Service) sendActivationMail(address, token string) error {
-	content, err := buildActivationMailContent(s.activationURL, token)
-	if err != nil {
-		return err
-	}
-
-	if err = s.mailSender.SendMail(address, activationMailSubject, content); err != nil {
-		return fmt.Errorf("send activation mail: %w", err)
-	}
-
-	return nil
+func newActivationURL(u url.URL, token string) string {
+	q := u.Query()
+	q.Set("token", token)
+	u.RawQuery = q.Encode()
+	return u.String()
 }

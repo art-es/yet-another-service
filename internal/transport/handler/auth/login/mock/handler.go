@@ -42,10 +42,10 @@ func (m *MockauthService) EXPECT() *MockauthServiceMockRecorder {
 }
 
 // Login mocks base method.
-func (m *MockauthService) Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResult, error) {
+func (m *MockauthService) Login(ctx context.Context, req *auth.LoginIn) (*auth.LoginOut, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Login", ctx, req)
-	ret0, _ := ret[0].(*auth.LoginResult)
+	ret0, _ := ret[0].(*auth.LoginOut)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

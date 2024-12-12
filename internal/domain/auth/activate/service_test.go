@@ -9,8 +9,9 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/art-es/yet-another-service/internal/core/transaction"
-	"github.com/art-es/yet-another-service/internal/domain/auth"
 	"github.com/art-es/yet-another-service/internal/domain/auth/activate/mock"
+	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
+	"github.com/art-es/yet-another-service/internal/domain/shared/models"
 )
 
 func TestService(t *testing.T) {
@@ -28,34 +29,34 @@ func TestService(t *testing.T) {
 			name: "find activation by token in repository error",
 			setup: func(t *testing.T, m mocks) {
 				m.activationRepository.EXPECT().
-					FindByToken(gomock.Any(), gomock.Eq("dummy token")).
+					Find(gomock.Any(), gomock.Eq("dummy token")).
 					Return(nil, errors.New("dummy error"))
 			},
 			assert: func(t *testing.T, err error) {
-				assert.EqualError(t, err, "find activation by token in repository: dummy error")
+				assert.EqualError(t, err, "find activation in repository: dummy error")
 			},
 		},
 		{
 			name: "activation not found",
 			setup: func(t *testing.T, m mocks) {
 				m.activationRepository.EXPECT().
-					FindByToken(gomock.Any(), gomock.Eq("dummy token")).
+					Find(gomock.Any(), gomock.Eq("dummy token")).
 					Return(nil, nil)
 			},
 			assert: func(t *testing.T, err error) {
-				assert.ErrorIs(t, err, auth.ErrActivationNotFound)
+				assert.ErrorIs(t, err, errorsd.ErrUserActivationNotFound)
 			},
 		},
 		{
 			name: "activate user in repository error",
 			setup: func(t *testing.T, m mocks) {
-				activation := &auth.Activation{
+				activation := &models.UserActivation{
 					Token:  "dummy token",
 					UserID: "dummy user id",
 				}
 
 				m.activationRepository.EXPECT().
-					FindByToken(gomock.Any(), gomock.Eq("dummy token")).
+					Find(gomock.Any(), gomock.Eq("dummy token")).
 					Return(activation, nil)
 
 				m.userRepository.EXPECT().
@@ -69,13 +70,13 @@ func TestService(t *testing.T) {
 		{
 			name: "delete activation by token in repository error",
 			setup: func(t *testing.T, m mocks) {
-				activation := &auth.Activation{
+				activation := &models.UserActivation{
 					Token:  "dummy token",
 					UserID: "dummy user id",
 				}
 
 				m.activationRepository.EXPECT().
-					FindByToken(gomock.Any(), gomock.Eq("dummy token")).
+					Find(gomock.Any(), gomock.Eq("dummy token")).
 					Return(activation, nil)
 
 				m.userRepository.EXPECT().
@@ -93,13 +94,13 @@ func TestService(t *testing.T) {
 		{
 			name: "commit transaction error",
 			setup: func(t *testing.T, m mocks) {
-				activation := &auth.Activation{
+				activation := &models.UserActivation{
 					Token:  "dummy token",
 					UserID: "dummy user id",
 				}
 
 				m.activationRepository.EXPECT().
-					FindByToken(gomock.Any(), gomock.Eq("dummy token")).
+					Find(gomock.Any(), gomock.Eq("dummy token")).
 					Return(activation, nil)
 
 				m.userRepository.EXPECT().
@@ -122,13 +123,13 @@ func TestService(t *testing.T) {
 		{
 			name: "ok",
 			setup: func(t *testing.T, m mocks) {
-				activation := &auth.Activation{
+				activation := &models.UserActivation{
 					Token:  "dummy token",
 					UserID: "dummy user id",
 				}
 
 				m.activationRepository.EXPECT().
-					FindByToken(gomock.Any(), gomock.Eq("dummy token")).
+					Find(gomock.Any(), gomock.Eq("dummy token")).
 					Return(activation, nil)
 
 				m.userRepository.EXPECT().

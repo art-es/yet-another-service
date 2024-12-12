@@ -43,7 +43,7 @@ func (m *MockauthService) EXPECT() *MockauthServiceMockRecorder {
 }
 
 // Signup mocks base method.
-func (m *MockauthService) Signup(ctx context.Context, req *dto.SignupRequest) error {
+func (m *MockauthService) Signup(ctx context.Context, req *dto.SignupIn) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Signup", ctx, req)
 	ret0, _ := ret[0].(error)

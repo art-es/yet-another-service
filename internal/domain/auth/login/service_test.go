@@ -11,7 +11,8 @@ import (
 
 	"github.com/art-es/yet-another-service/internal/domain/auth"
 	"github.com/art-es/yet-another-service/internal/domain/auth/login/mock"
-	"github.com/art-es/yet-another-service/internal/domain/hash"
+	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
+	"github.com/art-es/yet-another-service/internal/domain/shared/models"
 )
 
 func TestService(t *testing.T) {
@@ -32,7 +33,7 @@ func TestService(t *testing.T) {
 	for _, tt := range []struct {
 		name   string
 		setup  func(t *testing.T, m mocks)
-		assert func(t *testing.T, res *auth.LoginResult, err error)
+		assert func(t *testing.T, res *auth.LoginOut, err error)
 	}{
 		{
 			name: "find user by email in repository error",
@@ -41,7 +42,7 @@ func TestService(t *testing.T) {
 					FindByEmail(gomock.Any(), gomock.Eq("iivan@example.com")).
 					Return(nil, errors.New("dummy error"))
 			},
-			assert: func(t *testing.T, res *auth.LoginResult, err error) {
+			assert: func(t *testing.T, res *auth.LoginOut, err error) {
 				assert.EqualError(t, err, "find user by email in repository: dummy error")
 				assert.Nil(t, res)
 			},
@@ -53,15 +54,15 @@ func TestService(t *testing.T) {
 					FindByEmail(gomock.Any(), gomock.Eq("iivan@example.com")).
 					Return(nil, nil)
 			},
-			assert: func(t *testing.T, res *auth.LoginResult, err error) {
-				assert.ErrorIs(t, err, auth.ErrUserNotFound)
+			assert: func(t *testing.T, res *auth.LoginOut, err error) {
+				assert.ErrorIs(t, err, errorsd.ErrUserNotFound)
 				assert.Nil(t, res)
 			},
 		},
 		{
 			name: "check password by hash error",
 			setup: func(t *testing.T, m mocks) {
-				user := &auth.User{
+				user := &models.User{
 					ID:           "dummy user id",
 					Name:         "Ivanov Ivan",
 					Email:        "iivan@example.com",
@@ -76,7 +77,7 @@ func TestService(t *testing.T) {
 					Check(gomock.Eq("secret123"), gomock.Eq("dummy password hash")).
 					Return(errors.New("dummy error"))
 			},
-			assert: func(t *testing.T, res *auth.LoginResult, err error) {
+			assert: func(t *testing.T, res *auth.LoginOut, err error) {
 				assert.EqualError(t, err, "check password by hash: dummy error")
 				assert.Nil(t, res)
 			},
@@ -84,7 +85,7 @@ func TestService(t *testing.T) {
 		{
 			name: "wrong password",
 			setup: func(t *testing.T, m mocks) {
-				user := &auth.User{
+				user := &models.User{
 					ID:           "dummy user id",
 					Name:         "Ivanov Ivan",
 					Email:        "iivan@example.com",
@@ -97,17 +98,17 @@ func TestService(t *testing.T) {
 
 				m.hashChecker.EXPECT().
 					Check(gomock.Eq("secret123"), gomock.Eq("dummy password hash")).
-					Return(hash.ErrMismatched)
+					Return(errorsd.ErrHashMismatched)
 			},
-			assert: func(t *testing.T, res *auth.LoginResult, err error) {
-				assert.ErrorIs(t, err, auth.ErrWrongPassword)
+			assert: func(t *testing.T, res *auth.LoginOut, err error) {
+				assert.ErrorIs(t, err, errorsd.ErrWrongPassword)
 				assert.Nil(t, res)
 			},
 		},
 		{
 			name: "generate access token error",
 			setup: func(t *testing.T, m mocks) {
-				user := &auth.User{
+				user := &models.User{
 					ID:           "dummy user id",
 					Name:         "Ivanov Ivan",
 					Email:        "iivan@example.com",
@@ -132,7 +133,7 @@ func TestService(t *testing.T) {
 					Generate(gomock.Eq(expAccessTokenClaims)).
 					Return("", errors.New("dummy error"))
 			},
-			assert: func(t *testing.T, res *auth.LoginResult, err error) {
+			assert: func(t *testing.T, res *auth.LoginOut, err error) {
 				assert.EqualError(t, err, "generate access token: dummy error")
 				assert.Nil(t, res)
 			},
@@ -140,7 +141,7 @@ func TestService(t *testing.T) {
 		{
 			name: "generate refresh token error",
 			setup: func(t *testing.T, m mocks) {
-				user := &auth.User{
+				user := &models.User{
 					ID:           "dummy user id",
 					Name:         "Ivanov Ivan",
 					Email:        "iivan@example.com",
@@ -175,7 +176,7 @@ func TestService(t *testing.T) {
 					Generate(gomock.Eq(expRefreshTokenClaims)).
 					Return("", errors.New("dummy error"))
 			},
-			assert: func(t *testing.T, res *auth.LoginResult, err error) {
+			assert: func(t *testing.T, res *auth.LoginOut, err error) {
 				assert.EqualError(t, err, "generate refresh token: dummy error")
 				assert.Nil(t, res)
 			},
@@ -183,7 +184,7 @@ func TestService(t *testing.T) {
 		{
 			name: "ok",
 			setup: func(t *testing.T, m mocks) {
-				user := &auth.User{
+				user := &models.User{
 					ID:           "dummy user id",
 					Name:         "Ivanov Ivan",
 					Email:        "iivan@example.com",
@@ -218,9 +219,9 @@ func TestService(t *testing.T) {
 					Generate(gomock.Eq(expRefreshTokenClaims)).
 					Return("dummy refresh token", nil)
 			},
-			assert: func(t *testing.T, res *auth.LoginResult, err error) {
+			assert: func(t *testing.T, res *auth.LoginOut, err error) {
 				assert.NoError(t, err)
-				expResult := &auth.LoginResult{
+				expResult := &auth.LoginOut{
 					AccessToken:  "dummy access token",
 					RefreshToken: "dummy refresh token",
 				}
@@ -243,7 +244,7 @@ func TestService(t *testing.T) {
 			}
 
 			service := NewService(m.userRepository, m.hashChecker, m.tokenGenerator)
-			res, err := service.Login(context.Background(), &auth.LoginRequest{
+			res, err := service.Login(context.Background(), &auth.LoginIn{
 				Email:    "iivan@example.com",
 				Password: "secret123",
 			})

@@ -6,11 +6,12 @@ import (
 	"fmt"
 
 	"github.com/art-es/yet-another-service/internal/core/transaction"
-	"github.com/art-es/yet-another-service/internal/domain/auth"
+	"github.com/art-es/yet-another-service/internal/domain/shared/errors"
+	"github.com/art-es/yet-another-service/internal/domain/shared/models"
 )
 
 type activationRepository interface {
-	FindByToken(ctx context.Context, token string) (*auth.Activation, error)
+	Find(ctx context.Context, token string) (*models.UserActivation, error)
 	Delete(ctx context.Context, tx transaction.Transaction, token string) error
 }
 
@@ -34,13 +35,13 @@ func NewService(
 }
 
 func (s *Service) Activate(ctx context.Context, token string) error {
-	activation, err := s.activationRepository.FindByToken(ctx, token)
+	activation, err := s.activationRepository.Find(ctx, token)
 	if err != nil {
-		return fmt.Errorf("find activation by token in repository: %w", err)
+		return fmt.Errorf("find activation in repository: %w", err)
 	}
 
 	if activation == nil {
-		return auth.ErrActivationNotFound
+		return errors.ErrUserActivationNotFound
 	}
 
 	tx := transaction.New(ctx)
@@ -57,7 +58,7 @@ func (s *Service) Activate(ctx context.Context, token string) error {
 	return nil
 }
 
-func (s *Service) doTransaction(ctx context.Context, tx transaction.Transaction, activation *auth.Activation) error {
+func (s *Service) doTransaction(ctx context.Context, tx transaction.Transaction, activation *models.UserActivation) error {
 	if err := s.userRepository.Activate(ctx, tx, activation.UserID); err != nil {
 		return fmt.Errorf("activate user in repository: %w", err)
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 
 	"github.com/art-es/yet-another-service/internal/domain/auth"
+	"github.com/art-es/yet-another-service/internal/domain/shared/errors"
 )
 
 type Service struct {
@@ -49,12 +50,12 @@ func (s *Service) Parse(signedToken string) (*auth.TokenClaims, error) {
 		return s.secret, nil
 	})
 	if err != nil {
-		return nil, auth.ErrInvalidToken
+		return nil, errors.ErrInvalidAuthToken
 	}
 
 	claims, ok := token.Claims.(*internalClaims)
 	if !ok || !token.Valid {
-		return nil, auth.ErrInvalidToken
+		return nil, errors.ErrInvalidAuthToken
 	}
 
 	return &auth.TokenClaims{

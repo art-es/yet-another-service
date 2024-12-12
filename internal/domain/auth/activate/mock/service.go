@@ -14,7 +14,7 @@ import (
 	reflect "reflect"
 
 	transaction "github.com/art-es/yet-another-service/internal/core/transaction"
-	auth "github.com/art-es/yet-another-service/internal/domain/auth"
+	models "github.com/art-es/yet-another-service/internal/domain/shared/models"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -56,19 +56,19 @@ func (mr *MockactivationRepositoryMockRecorder) Delete(ctx, tx, token any) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockactivationRepository)(nil).Delete), ctx, tx, token)
 }
 
-// FindByToken mocks base method.
-func (m *MockactivationRepository) FindByToken(ctx context.Context, token string) (*auth.Activation, error) {
+// Find mocks base method.
+func (m *MockactivationRepository) Find(ctx context.Context, token string) (*models.UserActivation, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindByToken", ctx, token)
-	ret0, _ := ret[0].(*auth.Activation)
+	ret := m.ctrl.Call(m, "Find", ctx, token)
+	ret0, _ := ret[0].(*models.UserActivation)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindByToken indicates an expected call of FindByToken.
-func (mr *MockactivationRepositoryMockRecorder) FindByToken(ctx, token any) *gomock.Call {
+// Find indicates an expected call of Find.
+func (mr *MockactivationRepositoryMockRecorder) Find(ctx, token any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByToken", reflect.TypeOf((*MockactivationRepository)(nil).FindByToken), ctx, token)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockactivationRepository)(nil).Find), ctx, token)
 }
 
 // MockuserRepository is a mock of userRepository interface.

@@ -10,10 +10,11 @@ import (
 	"github.com/art-es/yet-another-service/internal/core/log"
 	"github.com/art-es/yet-another-service/internal/core/validation"
 	"github.com/art-es/yet-another-service/internal/domain/auth"
+	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
 )
 
 type authService interface {
-	Logout(ctx context.Context, req *auth.LogoutRequest) error
+	Logout(ctx context.Context, req *auth.LogoutIn) error
 }
 
 type request struct {
@@ -46,7 +47,7 @@ func (h *Handler) Handle(ctx http.Context) {
 		return
 	}
 
-	err = h.authService.Logout(ctx, &auth.LogoutRequest{
+	err = h.authService.Logout(ctx, &auth.LogoutIn{
 		AccessToken:  req.AccessToken,
 		RefreshToken: req.RefreshToken,
 	})
@@ -54,7 +55,7 @@ func (h *Handler) Handle(ctx http.Context) {
 	switch {
 	case err == nil:
 		http.Respond(ctx, nethttp.StatusOK, struct{}{})
-	case errors.Is(err, auth.ErrInvalidToken):
+	case errors.Is(err, errorsd.ErrInvalidAuthToken):
 		http.RespondBadRequest(ctx, err.Error())
 	default:
 		h.logger.Error().Err(err).Msg("logout error on auth service")

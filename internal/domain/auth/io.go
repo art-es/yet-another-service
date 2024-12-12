@@ -1,22 +1,22 @@
 package auth
 
-type SignupRequest struct {
+type SignupIn struct {
 	Name     string
 	Email    string
 	Password string
 }
 
-type LoginRequest struct {
+type LoginIn struct {
 	Email    string
 	Password string
 }
 
-type LoginResult struct {
+type LoginOut struct {
 	AccessToken  string
 	RefreshToken string
 }
 
-type LogoutRequest struct {
+type LogoutIn struct {
 	AccessToken  *string
 	RefreshToken string
 }

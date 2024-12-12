@@ -35,7 +35,7 @@ func NewService(
 	}
 }
 
-func (s *Service) Logout(ctx context.Context, req *auth.LogoutRequest) error {
+func (s *Service) Logout(ctx context.Context, req *auth.LogoutIn) error {
 	now := time.Now()
 
 	if err := s.invalidate(ctx, req.RefreshToken, now); err != nil {

@@ -5,9 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/art-es/yet-another-service/internal/domain/auth"
-
 	"github.com/art-es/yet-another-service/internal/core/transaction"
+	"github.com/art-es/yet-another-service/internal/domain/shared/models"
 )
 
 type UserActivationStorage struct {
@@ -20,22 +19,21 @@ func NewUserActivationStorage(db *sql.DB) *UserActivationStorage {
 	}
 }
 
-func (s *UserActivationStorage) Create(ctx context.Context, tx transaction.Transaction, userID string) (*auth.Activation, error) {
+func (s *UserActivationStorage) Save(ctx context.Context, tx transaction.Transaction, activation *models.UserActivation) error {
 	sqlTx, err := getSQLTxOrBegin(tx, s.db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	const query = "INSERT INTO user_activations (user_id) VALUES ($1) RETURNING (token, user_id)"
+	const query = "INSERT INTO user_activations (user_id) VALUES ($1) RETURNING token"
 
-	activation := &auth.Activation{}
-	err = sqlTx.QueryRowContext(ctx, query, userID).
-		Scan(&activation.Token, &activation.UserID)
+	err = sqlTx.QueryRowContext(ctx, query, activation.UserID).
+		Scan(&activation.Token)
 	if err != nil {
-		return nil, fmt.Errorf("execute query: %w", err)
+		return fmt.Errorf("execute query: %w", err)
 	}
 
-	return activation, nil
+	return nil
 }
 
 func (s *UserActivationStorage) Delete(ctx context.Context, tx transaction.Transaction, token string) error {
@@ -53,10 +51,10 @@ func (s *UserActivationStorage) Delete(ctx context.Context, tx transaction.Trans
 	return nil
 }
 
-func (s *UserActivationStorage) FindByToken(ctx context.Context, token string) (*auth.Activation, error) {
+func (s *UserActivationStorage) Find(ctx context.Context, token string) (*models.UserActivation, error) {
 	const query = "SELECT token, user_id FROM user_activations WHERE token=$1"
 
-	activation := &auth.Activation{}
+	activation := &models.UserActivation{}
 	err := s.db.QueryRowContext(ctx, query, token).
 		Scan(&activation.Token, &activation.UserID)
 	if err != nil {

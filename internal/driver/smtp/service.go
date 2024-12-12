@@ -41,7 +41,7 @@ func NewService(config Config) *Service {
 	}
 }
 
-func (s *Service) SendMail(to string, subject, content string) error {
+func (s *Service) MailTo(address, subject, content string) error {
 	body := &bytes.Buffer{}
 	data := mailTemplateData{
 		Subject: subject,
@@ -52,7 +52,7 @@ func (s *Service) SendMail(to string, subject, content string) error {
 		return fmt.Errorf("execute mail template: %w", err)
 	}
 
-	if err := smtp.SendMail(s.address, s.auth, s.from, []string{to}, body.Bytes()); err != nil {
+	if err := smtp.SendMail(s.address, s.auth, s.from, []string{address}, body.Bytes()); err != nil {
 		return fmt.Errorf("send mail: %w", err)
 	}
 

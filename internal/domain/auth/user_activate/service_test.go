@@ -1,4 +1,4 @@
-package activate
+package user_activate
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/art-es/yet-another-service/internal/core/transaction"
-	"github.com/art-es/yet-another-service/internal/domain/auth/activate/mock"
+	"github.com/art-es/yet-another-service/internal/domain/auth/user_activate/mock"
 	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
 	"github.com/art-es/yet-another-service/internal/domain/shared/models"
 )

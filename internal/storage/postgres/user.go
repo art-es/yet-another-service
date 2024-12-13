@@ -19,32 +19,6 @@ func NewUserStorage(db *sql.DB) *UserStorage {
 	}
 }
 
-func (s *UserStorage) Exists(ctx context.Context, email string) (bool, error) {
-	const query = "SELECT EXISTS(email) FROM users WHERE email=$1"
-
-	exists := false
-	err := s.db.QueryRowContext(ctx, query, email).
-		Scan(&exists)
-	if err != nil {
-		return false, fmt.Errorf("execute query: %w", err)
-	}
-
-	return exists, nil
-}
-
-func (s *UserStorage) FindByEmail(ctx context.Context, email string) (*models.User, error) {
-	const query = "SELECT id, name, email, password_hash FROM users WHERE email=$1"
-
-	user := &models.User{}
-	err := s.db.QueryRowContext(ctx, query, email).
-		Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash)
-	if err != nil {
-		return nil, fmt.Errorf("execute query: %w", err)
-	}
-
-	return user, nil
-}
-
 func (s *UserStorage) Activate(ctx context.Context, tx transaction.Transaction, userID string) error {
 	sqlTx, err := getSQLTxOrBegin(tx, s.db)
 	if err != nil {
@@ -58,6 +32,45 @@ func (s *UserStorage) Activate(ctx context.Context, tx transaction.Transaction, 
 	}
 
 	return nil
+}
+
+func (s *UserStorage) Exists(ctx context.Context, email string) (bool, error) {
+	const query = "SELECT EXISTS(email) FROM users WHERE email=$1"
+
+	exists := false
+	err := s.db.QueryRowContext(ctx, query, email).
+		Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("execute query: %w", err)
+	}
+
+	return exists, nil
+}
+
+func (s *UserStorage) Find(ctx context.Context, id string) (*models.User, error) {
+	const query = "SELECT id, name, email, password_hash FROM users WHERE id=$1"
+
+	user := &models.User{}
+	err := s.db.QueryRowContext(ctx, query, id).
+		Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash)
+	if err != nil {
+		return nil, fmt.Errorf("execute query: %w", err)
+	}
+
+	return user, nil
+}
+
+func (s *UserStorage) FindByEmail(ctx context.Context, email string) (*models.User, error) {
+	const query = "SELECT id, name, email, password_hash FROM users WHERE email=$1"
+
+	user := &models.User{}
+	err := s.db.QueryRowContext(ctx, query, email).
+		Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash)
+	if err != nil {
+		return nil, fmt.Errorf("execute query: %w", err)
+	}
+
+	return user, nil
 }
 
 func (s *UserStorage) Save(ctx context.Context, tx transaction.Transaction, user *models.User) error {

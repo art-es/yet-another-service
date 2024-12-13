@@ -10,14 +10,14 @@ import (
 	"github.com/art-es/yet-another-service/internal/core/mail/mock"
 )
 
-func TestUserActivationMailer(t *testing.T) {
+func TestUserPasswordRecoveryMailer(t *testing.T) {
 	const (
-		address       = "foo@example.com"
-		activationURL = `http://example.com/activate?token=foo`
-		content       = `<!DOCTYPE html>
+		address     = "foo@example.com"
+		recoveryURL = `http://example.com/recovery?token=foo`
+		content     = `<!DOCTYPE html>
 <html>
 <body>
-    <p>To activate your account follow by link http://example.com/activate?token=foo</p>
+    <p>To reset your password follow by link http://example.com/recovery?token=foo</p>
 </body>
 </html>`
 	)
@@ -31,7 +31,7 @@ func TestUserActivationMailer(t *testing.T) {
 			name: "mail error",
 			setup: func(mailer *mock.MockMailer) {
 				mailer.EXPECT().
-					MailTo(gomock.Eq(address), gomock.Eq(userActivationSubject), gomock.Eq(content)).
+					MailTo(gomock.Eq(address), gomock.Eq(passwordRecoverySubject), gomock.Eq(content)).
 					Return(errors.New("dummy error"))
 			},
 			assert: func(t *testing.T, err error) {
@@ -42,7 +42,7 @@ func TestUserActivationMailer(t *testing.T) {
 			name: "ok",
 			setup: func(mailer *mock.MockMailer) {
 				mailer.EXPECT().
-					MailTo(gomock.Eq(address), gomock.Eq(userActivationSubject), gomock.Eq(content)).
+					MailTo(gomock.Eq(address), gomock.Eq(passwordRecoverySubject), gomock.Eq(content)).
 					Return(nil)
 			},
 			assert: func(t *testing.T, err error) {
@@ -58,8 +58,8 @@ func TestUserActivationMailer(t *testing.T) {
 
 			tt.setup(mockBaseMailer)
 
-			err := NewUserActivationMailer(mockBaseMailer).
-				MailTo(address, UserActivationData{ActivationURL: activationURL})
+			err := NewPasswordRecoveryMailer(mockBaseMailer).
+				MailTo(address, PasswordRecoveryData{RecoveryURL: recoveryURL})
 
 			tt.assert(t, err)
 		})

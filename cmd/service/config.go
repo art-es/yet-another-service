@@ -23,11 +23,12 @@ var availableAppEnv = []string{
 }
 
 type appConfig struct {
-	appEnv            string
-	postgresURL       string
-	jwtSecret         string
-	userActivationURL url.URL
-	smtpConfig        driver_smtp.Config
+	appEnv                  string
+	postgresURL             string
+	jwtSecret               string
+	userActivationURL       url.URL
+	userPasswordRecoveryURL url.URL
+	smtpConfig              driver_smtp.Config
 
 	logger log.Logger
 }
@@ -38,6 +39,7 @@ func getAppConfig(logger log.Logger) *appConfig {
 	c.initPostgresURL()
 	c.initJWTSecret()
 	c.initUserActivationURL()
+	c.initUserPasswordRecoveryURL()
 	c.initSMTP()
 	return c
 }
@@ -91,7 +93,7 @@ func (c *appConfig) initUserActivationURL() {
 			c.logger.Panic().Msg("USER_ACTIVATION_URL is required")
 		}
 
-		rawURL = "http://127.0.0.1/auth/activate"
+		rawURL = "http://127.0.0.1/activate-user"
 	}
 
 	u, err := url.Parse(rawURL)
@@ -100,6 +102,25 @@ func (c *appConfig) initUserActivationURL() {
 	}
 
 	c.userActivationURL = *u
+}
+
+func (c *appConfig) initUserPasswordRecoveryURL() {
+	rawURL := os.Getenv("USER_PASSWORD_RECOVERY_URL")
+
+	if rawURL == "" {
+		if c.appEnv != appEnvLocal {
+			c.logger.Panic().Msg("USER_PASSWORD_RECOVERY_URL is required")
+		}
+
+		rawURL = "http://127.0.0.1/recover-password"
+	}
+
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		c.logger.Panic().Msg("USER_PASSWORD_RECOVERY_URL has invalid URL")
+	}
+
+	c.userPasswordRecoveryURL = *u
 }
 
 func (c *appConfig) initSMTP() {

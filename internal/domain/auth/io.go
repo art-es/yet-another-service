@@ -20,3 +20,9 @@ type LogoutIn struct {
 	AccessToken  *string
 	RefreshToken string
 }
+
+type PasswordRecoverIn struct {
+	Token       string
+	OldPassword string
+	NewPassword string
+}

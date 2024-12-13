@@ -4,8 +4,9 @@ import "errors"
 
 // Common
 var (
-	ErrUserNotFound           = errors.New("user not found")
-	ErrUserActivationNotFound = errors.New("user activation not found")
+	ErrUserNotFound                 = errors.New("user not found")
+	ErrUserActivationNotFound       = errors.New("user activation not found")
+	ErrUserPasswordRecoveryNotFound = errors.New("user password recovery not found")
 )
 
 // Auth specific

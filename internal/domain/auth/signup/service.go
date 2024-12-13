@@ -4,9 +4,7 @@ package signup
 import (
 	"context"
 	"fmt"
-	"net/url"
 
-	"github.com/art-es/yet-another-service/internal/core/mail"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 	"github.com/art-es/yet-another-service/internal/domain/auth"
 	"github.com/art-es/yet-another-service/internal/domain/shared/errors"
@@ -22,35 +20,25 @@ type userRepository interface {
 	Save(ctx context.Context, tx transaction.Transaction, user *models.User) error
 }
 
-type activationRepository interface {
-	Save(ctx context.Context, tx transaction.Transaction, activation *models.UserActivation) error
-}
-
-type activationMailer interface {
-	MailTo(address string, data mail.UserActivationData) error
+type activationService interface {
+	CreateActivation(ctx context.Context, tx transaction.Transaction, user *models.User) error
 }
 
 type Service struct {
-	baseActivationURL    url.URL
-	hashGenerator        hashGenerator
-	userRepository       userRepository
-	activationRepository activationRepository
-	activationMailer     activationMailer
+	hashGenerator     hashGenerator
+	userRepository    userRepository
+	activationService activationService
 }
 
 func NewService(
-	activationURL url.URL,
 	hashGenerateService hashGenerator,
 	userRepository userRepository,
-	activationRepository activationRepository,
-	activationMailer activationMailer,
+	activationService activationService,
 ) *Service {
 	return &Service{
-		baseActivationURL:    activationURL,
-		hashGenerator:        hashGenerateService,
-		userRepository:       userRepository,
-		activationRepository: activationRepository,
-		activationMailer:     activationMailer,
+		hashGenerator:     hashGenerateService,
+		userRepository:    userRepository,
+		activationService: activationService,
 	}
 }
 
@@ -94,28 +82,9 @@ func (s *Service) doTransaction(ctx context.Context, tx transaction.Transaction,
 		return fmt.Errorf("save user in repository: %w", err)
 	}
 
-	activation := &models.UserActivation{
-		UserID: user.ID,
-	}
-
-	if err = s.activationRepository.Save(ctx, tx, activation); err != nil {
-		return fmt.Errorf("save activation in repository: %w", err)
-	}
-
-	activationMailData := mail.UserActivationData{
-		ActivationURL: newActivationURL(s.baseActivationURL, activation.Token),
-	}
-
-	if err = s.activationMailer.MailTo(user.Email, activationMailData); err != nil {
-		return fmt.Errorf("mail activation to user: %w", err)
+	if err = s.activationService.CreateActivation(ctx, tx, user); err != nil {
+		return fmt.Errorf("create activation: %w", err)
 	}
 
 	return nil
-}
-
-func newActivationURL(u url.URL, token string) string {
-	q := u.Query()
-	q.Set("token", token)
-	u.RawQuery = q.Encode()
-	return u.String()
 }

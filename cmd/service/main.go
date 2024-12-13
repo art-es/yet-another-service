@@ -9,7 +9,7 @@ import (
 	domain_password_recovery "github.com/art-es/yet-another-service/internal/domain/auth/password_recovery"
 	domain_refresh "github.com/art-es/yet-another-service/internal/domain/auth/refresh"
 	domain_signup "github.com/art-es/yet-another-service/internal/domain/auth/signup"
-	domain_user_activate "github.com/art-es/yet-another-service/internal/domain/auth/user_activate"
+	domain_user_activation "github.com/art-es/yet-another-service/internal/domain/auth/user_activation"
 	driver_bcrypt "github.com/art-es/yet-another-service/internal/driver/bcrypt"
 	driver_gin "github.com/art-es/yet-another-service/internal/driver/gin"
 	driver_jwt "github.com/art-es/yet-another-service/internal/driver/jwt"
@@ -50,8 +50,8 @@ func main() {
 	passwordRecoveryMailer := mail.NewPasswordRecoveryMailer(smtpService)
 
 	// App Layer
-	signupService := domain_signup.NewService(config.userActivationURL, hashService, userStorage, userActivationStorage, userActivationMailer)
-	userActivateService := domain_user_activate.NewService(userActivationStorage, userStorage)
+	userActivationService := domain_user_activation.NewService(config.userActivationURL, userActivationStorage, userStorage, userActivationMailer)
+	signupService := domain_signup.NewService(hashService, userStorage, userActivationService)
 	loginService := domain_login.NewService(userStorage, hashService, jwtService)
 	logoutService := domain_logout.NewService(jwtService, authTokenBlackListStorage, logger)
 	refreshService := domain_refresh.NewService(jwtService)
@@ -59,7 +59,7 @@ func main() {
 
 	// Transport Layer
 	signupHandler := transport_signup.NewHandler(signupService, logger, validator)
-	userActivateHandler := transport_user_activate.NewHandler(userActivateService, logger, validator)
+	userActivateHandler := transport_user_activate.NewHandler(userActivationService, logger, validator)
 	loginHandler := transport_login.NewHandler(loginService, logger, validator)
 	logoutHandler := transport_logout.NewHandler(logoutService, logger, validator)
 	refreshHandler := transport_refresh.NewHandler(refreshService, logger)

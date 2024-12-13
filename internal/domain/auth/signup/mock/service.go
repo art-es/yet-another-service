@@ -13,7 +13,6 @@ import (
 	context "context"
 	reflect "reflect"
 
-	mail "github.com/art-es/yet-another-service/internal/core/mail"
 	transaction "github.com/art-es/yet-another-service/internal/core/transaction"
 	models "github.com/art-es/yet-another-service/internal/domain/shared/models"
 	gomock "go.uber.org/mock/gomock"
@@ -111,78 +110,40 @@ func (mr *MockuserRepositoryMockRecorder) Save(ctx, tx, user any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockuserRepository)(nil).Save), ctx, tx, user)
 }
 
-// MockactivationRepository is a mock of activationRepository interface.
-type MockactivationRepository struct {
+// MockactivationService is a mock of activationService interface.
+type MockactivationService struct {
 	ctrl     *gomock.Controller
-	recorder *MockactivationRepositoryMockRecorder
+	recorder *MockactivationServiceMockRecorder
 	isgomock struct{}
 }
 
-// MockactivationRepositoryMockRecorder is the mock recorder for MockactivationRepository.
-type MockactivationRepositoryMockRecorder struct {
-	mock *MockactivationRepository
+// MockactivationServiceMockRecorder is the mock recorder for MockactivationService.
+type MockactivationServiceMockRecorder struct {
+	mock *MockactivationService
 }
 
-// NewMockactivationRepository creates a new mock instance.
-func NewMockactivationRepository(ctrl *gomock.Controller) *MockactivationRepository {
-	mock := &MockactivationRepository{ctrl: ctrl}
-	mock.recorder = &MockactivationRepositoryMockRecorder{mock}
+// NewMockactivationService creates a new mock instance.
+func NewMockactivationService(ctrl *gomock.Controller) *MockactivationService {
+	mock := &MockactivationService{ctrl: ctrl}
+	mock.recorder = &MockactivationServiceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockactivationRepository) EXPECT() *MockactivationRepositoryMockRecorder {
+func (m *MockactivationService) EXPECT() *MockactivationServiceMockRecorder {
 	return m.recorder
 }
 
-// Save mocks base method.
-func (m *MockactivationRepository) Save(ctx context.Context, tx transaction.Transaction, activation *models.UserActivation) error {
+// CreateActivation mocks base method.
+func (m *MockactivationService) CreateActivation(ctx context.Context, tx transaction.Transaction, user *models.User) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Save", ctx, tx, activation)
+	ret := m.ctrl.Call(m, "CreateActivation", ctx, tx, user)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Save indicates an expected call of Save.
-func (mr *MockactivationRepositoryMockRecorder) Save(ctx, tx, activation any) *gomock.Call {
+// CreateActivation indicates an expected call of CreateActivation.
+func (mr *MockactivationServiceMockRecorder) CreateActivation(ctx, tx, user any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockactivationRepository)(nil).Save), ctx, tx, activation)
-}
-
-// MockactivationMailer is a mock of activationMailer interface.
-type MockactivationMailer struct {
-	ctrl     *gomock.Controller
-	recorder *MockactivationMailerMockRecorder
-	isgomock struct{}
-}
-
-// MockactivationMailerMockRecorder is the mock recorder for MockactivationMailer.
-type MockactivationMailerMockRecorder struct {
-	mock *MockactivationMailer
-}
-
-// NewMockactivationMailer creates a new mock instance.
-func NewMockactivationMailer(ctrl *gomock.Controller) *MockactivationMailer {
-	mock := &MockactivationMailer{ctrl: ctrl}
-	mock.recorder = &MockactivationMailerMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockactivationMailer) EXPECT() *MockactivationMailerMockRecorder {
-	return m.recorder
-}
-
-// MailTo mocks base method.
-func (m *MockactivationMailer) MailTo(address string, data mail.UserActivationData) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MailTo", address, data)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// MailTo indicates an expected call of MailTo.
-func (mr *MockactivationMailerMockRecorder) MailTo(address, data any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MailTo", reflect.TypeOf((*MockactivationMailer)(nil).MailTo), address, data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateActivation", reflect.TypeOf((*MockactivationService)(nil).CreateActivation), ctx, tx, user)
 }

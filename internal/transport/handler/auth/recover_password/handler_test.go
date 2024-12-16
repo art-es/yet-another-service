@@ -1,4 +1,4 @@
-package recover_password
+package recoverpassword
 
 import (
 	"bufio"

@@ -10,9 +10,9 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/art-es/yet-another-service/internal/app/auth"
-	"github.com/art-es/yet-another-service/internal/app/auth/password_recovery/mock"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/user/password_recovery/mock"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 

@@ -1,4 +1,4 @@
-package user_activation
+package activation
 
 import (
 	"context"

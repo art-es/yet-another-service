@@ -1,5 +1,5 @@
 //go:generate mockgen -source=handler.go -destination=mock/handler.go -package=mock
-package forgot_password
+package forgotpassword
 
 import (
 	"context"

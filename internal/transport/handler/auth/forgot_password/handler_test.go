@@ -1,4 +1,4 @@
-package forgot_password
+package forgotpassword
 
 import (
 	"bufio"

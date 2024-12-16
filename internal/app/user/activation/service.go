@@ -1,5 +1,5 @@
 //go:generate mockgen -source=service.go -destination=mock/service.go -package=mock
-package user_activation
+package activation
 
 import (
 	"context"

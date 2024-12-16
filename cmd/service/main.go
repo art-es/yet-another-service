@@ -3,69 +3,69 @@ package main
 import (
 	"net/http"
 
-	app_login "github.com/art-es/yet-another-service/internal/app/auth/login"
-	app_logout "github.com/art-es/yet-another-service/internal/app/auth/logout"
-	app_password_recovery "github.com/art-es/yet-another-service/internal/app/auth/password_recovery"
-	app_refresh "github.com/art-es/yet-another-service/internal/app/auth/refresh"
-	app_signup "github.com/art-es/yet-another-service/internal/app/auth/signup"
-	app_user_activation "github.com/art-es/yet-another-service/internal/app/auth/user_activation"
+	"github.com/art-es/yet-another-service/internal/app/auth/login"
+	"github.com/art-es/yet-another-service/internal/app/auth/logout"
+	"github.com/art-es/yet-another-service/internal/app/auth/refresh"
+	"github.com/art-es/yet-another-service/internal/app/auth/signup"
+	useractivation "github.com/art-es/yet-another-service/internal/app/user/activation"
+	passwordrecovery "github.com/art-es/yet-another-service/internal/app/user/password_recovery"
 	"github.com/art-es/yet-another-service/internal/core/mail"
-	driver_bcrypt "github.com/art-es/yet-another-service/internal/driver/bcrypt"
-	driver_gin "github.com/art-es/yet-another-service/internal/driver/gin"
-	driver_jwt "github.com/art-es/yet-another-service/internal/driver/jwt"
-	driver_postgres "github.com/art-es/yet-another-service/internal/driver/postgres"
-	driver_validator "github.com/art-es/yet-another-service/internal/driver/validator"
-	driver_zerolog "github.com/art-es/yet-another-service/internal/driver/zerolog"
-	storage_postgres "github.com/art-es/yet-another-service/internal/storage/postgres"
-	storage_redis "github.com/art-es/yet-another-service/internal/storage/redis"
-	transport_user_activate "github.com/art-es/yet-another-service/internal/transport/handler/auth/activate"
-	transport_forgot_password "github.com/art-es/yet-another-service/internal/transport/handler/auth/forgot_password"
-	transport_login "github.com/art-es/yet-another-service/internal/transport/handler/auth/login"
-	transport_logout "github.com/art-es/yet-another-service/internal/transport/handler/auth/logout"
-	transport_recover_password "github.com/art-es/yet-another-service/internal/transport/handler/auth/recover_password"
-	transport_refresh "github.com/art-es/yet-another-service/internal/transport/handler/auth/refresh"
-	transport_signup "github.com/art-es/yet-another-service/internal/transport/handler/auth/signup"
+	bcryptDriver "github.com/art-es/yet-another-service/internal/driver/bcrypt"
+	driverGin "github.com/art-es/yet-another-service/internal/driver/gin"
+	jwtDriver "github.com/art-es/yet-another-service/internal/driver/jwt"
+	pqDriver "github.com/art-es/yet-another-service/internal/driver/postgres"
+	validatorDriver "github.com/art-es/yet-another-service/internal/driver/validator"
+	"github.com/art-es/yet-another-service/internal/driver/zerolog"
+	pqstorage "github.com/art-es/yet-another-service/internal/storage/postgres"
+	redisstorage "github.com/art-es/yet-another-service/internal/storage/redis"
+	useractivateTransport "github.com/art-es/yet-another-service/internal/transport/handler/auth/activate"
+	forgotpasswordTransport "github.com/art-es/yet-another-service/internal/transport/handler/auth/forgot_password"
+	loginTransport "github.com/art-es/yet-another-service/internal/transport/handler/auth/login"
+	logoutTransport "github.com/art-es/yet-another-service/internal/transport/handler/auth/logout"
+	recoverpasswordTransport "github.com/art-es/yet-another-service/internal/transport/handler/auth/recover_password"
+	refreshtokenTransport "github.com/art-es/yet-another-service/internal/transport/handler/auth/refresh"
+	signupTransport "github.com/art-es/yet-another-service/internal/transport/handler/auth/signup"
 )
 
 func main() {
-	logger := driver_zerolog.NewLogger()
+	logger := zerolog.NewLogger()
 	config := getAppConfig(logger)
 
 	// Drivers
-	validator := driver_validator.New()
-	hashService := driver_bcrypt.NewHashService()
-	postgresDB := driver_postgres.Connect(config.postgresURL)
-	jwtService := driver_jwt.NewService(config.jwtSecret)
+	pqDB := pqDriver.Connect(config.postgresURL)
+	validator := validatorDriver.New()
+	hashService := bcryptDriver.NewHashService()
+	jwtService := jwtDriver.NewService(config.jwtSecret)
 
 	// Data Layer
-	userStorage := storage_postgres.NewUserStorage(postgresDB)
-	userActivationStorage := storage_postgres.NewUserActivationStorage(postgresDB)
-	passwordRecoveryStorage := storage_postgres.NewPasswordRecoveryStorage(postgresDB)
-	mailStorage := storage_postgres.NewMailStorage(postgresDB)
-	authTokenBlackListStorage := storage_redis.NewAuthTokenBlackListStorage()
+	userStorage := pqstorage.NewUserStorage(pqDB)
+	userActivationStorage := pqstorage.NewUserActivationStorage(pqDB)
+	passwordRecoveryStorage := pqstorage.NewPasswordRecoveryStorage(pqDB)
+	mailStorage := pqstorage.NewMailStorage(pqDB)
+	authTokenBlackListStorage := redisstorage.NewAuthTokenBlackListStorage()
 
 	// Mailers
 	userActivationMailer := mail.NewUserActivationMailer(mailStorage)
 	passwordRecoveryMailer := mail.NewPasswordRecoveryMailer(mailStorage)
 
 	// App Layer
-	userActivationService := app_user_activation.NewService(config.userActivationURL, userActivationStorage, userStorage, userActivationMailer)
-	signupService := app_signup.NewService(hashService, userStorage, userActivationService)
-	loginService := app_login.NewService(userStorage, hashService, jwtService)
-	logoutService := app_logout.NewService(jwtService, authTokenBlackListStorage, logger)
-	refreshService := app_refresh.NewService(jwtService)
-	passwordRecoveryService := app_password_recovery.NewService(config.userPasswordRecoveryURL, userStorage, passwordRecoveryStorage, passwordRecoveryMailer, hashService)
+	userActivationService := useractivation.NewService(config.userActivationURL, userActivationStorage, userStorage, userActivationMailer)
+	passwordRecoveryService := passwordrecovery.NewService(config.userPasswordRecoveryURL, userStorage, passwordRecoveryStorage, passwordRecoveryMailer, hashService)
+	signupService := signup.NewService(hashService, userStorage, userActivationService)
+	loginService := login.NewService(userStorage, hashService, jwtService)
+	logoutService := logout.NewService(jwtService, authTokenBlackListStorage, logger)
+	refreshTokenService := refresh.NewService(jwtService)
 
 	// Transport Layer
-	signupHandler := transport_signup.NewHandler(signupService, logger, validator)
-	userActivateHandler := transport_user_activate.NewHandler(userActivationService, logger, validator)
-	loginHandler := transport_login.NewHandler(loginService, logger, validator)
-	logoutHandler := transport_logout.NewHandler(logoutService, logger, validator)
-	refreshHandler := transport_refresh.NewHandler(refreshService, logger)
-	forgotPasswordHandler := transport_forgot_password.NewHandler(passwordRecoveryService, logger, validator)
-	recoverPasswordHandler := transport_recover_password.NewHandler(passwordRecoveryService, logger, validator)
+	signupHandler := signupTransport.NewHandler(signupService, logger, validator)
+	userActivateHandler := useractivateTransport.NewHandler(userActivationService, logger, validator)
+	loginHandler := loginTransport.NewHandler(loginService, logger, validator)
+	logoutHandler := logoutTransport.NewHandler(logoutService, logger, validator)
+	refreshHandler := refreshtokenTransport.NewHandler(refreshTokenService, logger)
+	forgotPasswordHandler := forgotpasswordTransport.NewHandler(passwordRecoveryService, logger, validator)
+	recoverPasswordHandler := recoverpasswordTransport.NewHandler(passwordRecoveryService, logger, validator)
 
-	router := driver_gin.NewRouter()
+	router := driverGin.NewRouter()
 	router.Register(http.MethodPost, "/auth/signup", signupHandler.Handle)
 	router.Register(http.MethodGet, "/auth/activate", userActivateHandler.Handle)
 	router.Register(http.MethodPost, "/auth/login", loginHandler.Handle)

@@ -8,7 +8,7 @@ import (
 
 	"github.com/lib/pq"
 
-	"github.com/art-es/yet-another-service/internal/domain/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/models"
 )
 
 type MailStorage struct {

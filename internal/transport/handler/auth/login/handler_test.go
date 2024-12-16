@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
+	"github.com/art-es/yet-another-service/internal/app/auth"
 	mockhttp "github.com/art-es/yet-another-service/internal/core/http/mock"
 	mockvalidation "github.com/art-es/yet-another-service/internal/core/validation/mock"
-	"github.com/art-es/yet-another-service/internal/domain/auth"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
 	"github.com/art-es/yet-another-service/internal/transport/handler/auth/login/mock"
 )

@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/art-es/yet-another-service/internal/app/mailing"
 	"github.com/art-es/yet-another-service/internal/core/retrier"
-	"github.com/art-es/yet-another-service/internal/domain/mailing"
 	pq "github.com/art-es/yet-another-service/internal/driver/postgres"
 	"github.com/art-es/yet-another-service/internal/driver/smtp"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"

@@ -5,8 +5,8 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 
-	"github.com/art-es/yet-another-service/internal/domain/auth"
-	"github.com/art-es/yet-another-service/internal/domain/shared/errors"
+	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/errors"
 )
 
 type Service struct {

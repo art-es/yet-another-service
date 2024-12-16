@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
+	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 )
 
 func TestHashService(t *testing.T) {
@@ -26,12 +26,12 @@ func TestHashService(t *testing.T) {
 		assert.NotEmpty(t, hashStr)
 
 		err = hashService.Check("bar", hashStr)
-		assert.ErrorIs(t, err, errorsd.ErrHashMismatched)
+		assert.ErrorIs(t, err, apperrors.ErrHashMismatched)
 	})
 
 	t.Run("wrong hash", func(t *testing.T) {
 		err := hashService.Check("bar", "foo")
 		assert.Error(t, err)
-		assert.NotErrorIs(t, err, errorsd.ErrHashMismatched)
+		assert.NotErrorIs(t, err, apperrors.ErrHashMismatched)
 	})
 }

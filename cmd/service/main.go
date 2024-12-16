@@ -3,13 +3,13 @@ package main
 import (
 	"net/http"
 
+	app_login "github.com/art-es/yet-another-service/internal/app/auth/login"
+	app_logout "github.com/art-es/yet-another-service/internal/app/auth/logout"
+	app_password_recovery "github.com/art-es/yet-another-service/internal/app/auth/password_recovery"
+	app_refresh "github.com/art-es/yet-another-service/internal/app/auth/refresh"
+	app_signup "github.com/art-es/yet-another-service/internal/app/auth/signup"
+	app_user_activation "github.com/art-es/yet-another-service/internal/app/auth/user_activation"
 	"github.com/art-es/yet-another-service/internal/core/mail"
-	domain_login "github.com/art-es/yet-another-service/internal/domain/auth/login"
-	domain_logout "github.com/art-es/yet-another-service/internal/domain/auth/logout"
-	domain_password_recovery "github.com/art-es/yet-another-service/internal/domain/auth/password_recovery"
-	domain_refresh "github.com/art-es/yet-another-service/internal/domain/auth/refresh"
-	domain_signup "github.com/art-es/yet-another-service/internal/domain/auth/signup"
-	domain_user_activation "github.com/art-es/yet-another-service/internal/domain/auth/user_activation"
 	driver_bcrypt "github.com/art-es/yet-another-service/internal/driver/bcrypt"
 	driver_gin "github.com/art-es/yet-another-service/internal/driver/gin"
 	driver_jwt "github.com/art-es/yet-another-service/internal/driver/jwt"
@@ -49,12 +49,12 @@ func main() {
 	passwordRecoveryMailer := mail.NewPasswordRecoveryMailer(mailStorage)
 
 	// App Layer
-	userActivationService := domain_user_activation.NewService(config.userActivationURL, userActivationStorage, userStorage, userActivationMailer)
-	signupService := domain_signup.NewService(hashService, userStorage, userActivationService)
-	loginService := domain_login.NewService(userStorage, hashService, jwtService)
-	logoutService := domain_logout.NewService(jwtService, authTokenBlackListStorage, logger)
-	refreshService := domain_refresh.NewService(jwtService)
-	passwordRecoveryService := domain_password_recovery.NewService(config.userPasswordRecoveryURL, userStorage, passwordRecoveryStorage, passwordRecoveryMailer, hashService)
+	userActivationService := app_user_activation.NewService(config.userActivationURL, userActivationStorage, userStorage, userActivationMailer)
+	signupService := app_signup.NewService(hashService, userStorage, userActivationService)
+	loginService := app_login.NewService(userStorage, hashService, jwtService)
+	logoutService := app_logout.NewService(jwtService, authTokenBlackListStorage, logger)
+	refreshService := app_refresh.NewService(jwtService)
+	passwordRecoveryService := app_password_recovery.NewService(config.userPasswordRecoveryURL, userStorage, passwordRecoveryStorage, passwordRecoveryMailer, hashService)
 
 	// Transport Layer
 	signupHandler := transport_signup.NewHandler(signupService, logger, validator)

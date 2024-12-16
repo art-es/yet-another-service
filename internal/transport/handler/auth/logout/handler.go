@@ -6,11 +6,11 @@ import (
 	"errors"
 	nethttp "net/http"
 
+	"github.com/art-es/yet-another-service/internal/app/auth"
+	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/http"
 	"github.com/art-es/yet-another-service/internal/core/log"
 	"github.com/art-es/yet-another-service/internal/core/validation"
-	"github.com/art-es/yet-another-service/internal/domain/auth"
-	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
 )
 
 type authService interface {
@@ -55,7 +55,7 @@ func (h *Handler) Handle(ctx http.Context) {
 	switch {
 	case err == nil:
 		http.Respond(ctx, nethttp.StatusOK, struct{}{})
-	case errors.Is(err, errorsd.ErrInvalidAuthToken):
+	case errors.Is(err, apperrors.ErrInvalidAuthToken):
 		http.RespondBadRequest(ctx, err.Error())
 	default:
 		h.logger.Error().Err(err).Msg("logout error on auth service")

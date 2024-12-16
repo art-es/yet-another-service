@@ -6,11 +6,11 @@ import (
 	"errors"
 	nethttp "net/http"
 
+	"github.com/art-es/yet-another-service/internal/app/auth"
+	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/http"
 	"github.com/art-es/yet-another-service/internal/core/log"
 	"github.com/art-es/yet-another-service/internal/core/validation"
-	"github.com/art-es/yet-another-service/internal/domain/auth"
-	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
 )
 
 const tokenType = "Bearer"
@@ -67,7 +67,7 @@ func (h *Handler) Handle(ctx http.Context) {
 			RefreshToken: out.RefreshToken,
 			TokenType:    tokenType,
 		})
-	case errors.Is(err, errorsd.ErrUserNotFound) || errors.Is(err, errorsd.ErrWrongPassword):
+	case errors.Is(err, apperrors.ErrUserNotFound) || errors.Is(err, apperrors.ErrWrongPassword):
 		http.RespondBadRequest(ctx, "Wrong credentials.")
 	default:
 		h.logger.Error().Err(err).Msg("login error on auth service")

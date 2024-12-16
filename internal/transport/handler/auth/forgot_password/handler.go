@@ -6,10 +6,10 @@ import (
 	"errors"
 	nethttp "net/http"
 
+	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/http"
 	"github.com/art-es/yet-another-service/internal/core/log"
 	"github.com/art-es/yet-another-service/internal/core/validation"
-	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
 )
 
 type authService interface {
@@ -50,7 +50,7 @@ func (h *Handler) Handle(ctx http.Context) {
 	switch {
 	case err == nil:
 		http.Respond(ctx, nethttp.StatusOK, struct{}{})
-	case errors.Is(err, errorsd.ErrUserNotFound):
+	case errors.Is(err, apperrors.ErrUserNotFound):
 		http.RespondBadRequest(ctx, "user with this email not found")
 	default:
 		h.logger.Error().Err(err).Msg("create recovery error on auth service")

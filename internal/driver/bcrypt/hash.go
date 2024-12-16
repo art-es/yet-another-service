@@ -3,7 +3,7 @@ package bcrypt
 import (
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/art-es/yet-another-service/internal/domain/shared/errors"
+	"github.com/art-es/yet-another-service/internal/app/shared/errors"
 )
 
 type HashService struct{}

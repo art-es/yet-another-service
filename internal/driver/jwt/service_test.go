@@ -4,11 +4,10 @@ import (
 	"testing"
 	"time"
 
-	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
-
 	"github.com/stretchr/testify/assert"
 
-	"github.com/art-es/yet-another-service/internal/domain/auth"
+	"github.com/art-es/yet-another-service/internal/app/auth"
+	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 )
 
 const month = 30 * 24 * time.Hour
@@ -24,7 +23,7 @@ func TestService_Expired(t *testing.T) {
 		assert.NotEmpty(t, token)
 
 		claims, err := service.Parse(token)
-		assert.ErrorIs(t, err, errorsd.ErrInvalidAuthToken)
+		assert.ErrorIs(t, err, apperrors.ErrInvalidAuthToken)
 		assert.Nil(t, claims)
 	})
 

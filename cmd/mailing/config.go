@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/art-es/yet-another-service/internal/app/mailing"
 	"github.com/art-es/yet-another-service/internal/core/log"
-	"github.com/art-es/yet-another-service/internal/domain/mailing"
 	"github.com/art-es/yet-another-service/internal/driver/smtp"
 )
 

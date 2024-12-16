@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/art-es/yet-another-service/internal/app/shared/models"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
-	"github.com/art-es/yet-another-service/internal/domain/shared/models"
 )
 
 type PasswordRecoveryStorage struct {

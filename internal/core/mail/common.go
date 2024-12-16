@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/art-es/yet-another-service/internal/domain/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/models"
 )
 
 type mailRepository interface {

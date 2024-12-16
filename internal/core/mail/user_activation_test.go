@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
+	"github.com/art-es/yet-another-service/internal/app/shared/models"
 	"github.com/art-es/yet-another-service/internal/core/mail/mock"
-	"github.com/art-es/yet-another-service/internal/domain/shared/models"
 )
 
 func TestUserActivationMailer(t *testing.T) {

@@ -13,10 +13,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
+	"github.com/art-es/yet-another-service/internal/app/auth"
+	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	mockhttp "github.com/art-es/yet-another-service/internal/core/http/mock"
 	mockvalidation "github.com/art-es/yet-another-service/internal/core/validation/mock"
-	"github.com/art-es/yet-another-service/internal/domain/auth"
-	errorsd "github.com/art-es/yet-another-service/internal/domain/shared/errors"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
 	"github.com/art-es/yet-another-service/internal/transport/handler/auth/logout/mock"
 	"github.com/art-es/yet-another-service/internal/util/pointer"
@@ -112,7 +112,7 @@ func TestHandler(t *testing.T) {
 				expAuthReq := &auth.LogoutIn{RefreshToken: "dummy refresh token"}
 				authSvc.EXPECT().
 					Logout(gomock.Any(), gomock.Eq(expAuthReq)).
-					Return(errorsd.ErrInvalidAuthToken)
+					Return(apperrors.ErrInvalidAuthToken)
 			},
 			assert: func(t *testing.T, res *httptest.ResponseRecorder, logs []string) {
 				assert.Equal(t, http.StatusBadRequest, res.Code)

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -20,14 +19,6 @@ func TestService(t *testing.T) {
 		userRepository *mock.MockuserRepository
 		hashChecker    *mock.MockhashChecker
 		tokenGenerator *mock.MocktokenGenerator
-	}
-
-	now, _ := time.Parse(time.DateTime, "2000-01-01 10:00:00")
-	nextHour, _ := time.Parse(time.DateTime, "2000-01-01 11:00:00")
-	nextWeek, _ := time.Parse(time.DateTime, "2000-01-08 10:00:00")
-
-	getCurrentTime = func() time.Time {
-		return now
 	}
 
 	for _, tt := range []struct {
@@ -106,7 +97,7 @@ func TestService(t *testing.T) {
 			},
 		},
 		{
-			name: "generate access token error",
+			name: "generate tokens error",
 			setup: func(t *testing.T, m mocks) {
 				user := &models.User{
 					ID:           "dummy user id",
@@ -123,61 +114,12 @@ func TestService(t *testing.T) {
 					Check(gomock.Eq("secret123"), gomock.Eq("dummy password hash")).
 					Return(nil)
 
-				expAccessTokenClaims := &auth.TokenClaims{
-					IssuedAt:  now,
-					ExpiresAt: nextHour,
-					UserID:    "dummy user id",
-				}
-
 				m.tokenGenerator.EXPECT().
-					Generate(gomock.Eq(expAccessTokenClaims)).
-					Return("", errors.New("dummy error"))
+					Generate(gomock.Eq("dummy user id")).
+					Return(nil, errors.New("dummy error"))
 			},
 			assert: func(t *testing.T, res *auth.LoginOut, err error) {
-				assert.EqualError(t, err, "generate access token: dummy error")
-				assert.Nil(t, res)
-			},
-		},
-		{
-			name: "generate refresh token error",
-			setup: func(t *testing.T, m mocks) {
-				user := &models.User{
-					ID:           "dummy user id",
-					Name:         "Ivanov Ivan",
-					Email:        "iivan@example.com",
-					PasswordHash: "dummy password hash",
-				}
-
-				m.userRepository.EXPECT().
-					FindByEmail(gomock.Any(), gomock.Eq("iivan@example.com")).
-					Return(user, nil)
-
-				m.hashChecker.EXPECT().
-					Check(gomock.Eq("secret123"), gomock.Eq("dummy password hash")).
-					Return(nil)
-
-				expAccessTokenClaims := &auth.TokenClaims{
-					IssuedAt:  now,
-					ExpiresAt: nextHour,
-					UserID:    "dummy user id",
-				}
-
-				m.tokenGenerator.EXPECT().
-					Generate(gomock.Eq(expAccessTokenClaims)).
-					Return("dummy access token", nil)
-
-				expRefreshTokenClaims := &auth.TokenClaims{
-					IssuedAt:  now,
-					ExpiresAt: nextWeek,
-					UserID:    "dummy user id",
-				}
-
-				m.tokenGenerator.EXPECT().
-					Generate(gomock.Eq(expRefreshTokenClaims)).
-					Return("", errors.New("dummy error"))
-			},
-			assert: func(t *testing.T, res *auth.LoginOut, err error) {
-				assert.EqualError(t, err, "generate refresh token: dummy error")
+				assert.EqualError(t, err, "generate tokens: dummy error")
 				assert.Nil(t, res)
 			},
 		},
@@ -199,25 +141,14 @@ func TestService(t *testing.T) {
 					Check(gomock.Eq("secret123"), gomock.Eq("dummy password hash")).
 					Return(nil)
 
-				expAccessTokenClaims := &auth.TokenClaims{
-					IssuedAt:  now,
-					ExpiresAt: nextHour,
-					UserID:    "dummy user id",
+				tokensPair := &auth.TokenPair{
+					AccessToken:  "dummy access token",
+					RefreshToken: "dummy refresh token",
 				}
 
 				m.tokenGenerator.EXPECT().
-					Generate(gomock.Eq(expAccessTokenClaims)).
-					Return("dummy access token", nil)
-
-				expRefreshTokenClaims := &auth.TokenClaims{
-					IssuedAt:  now,
-					ExpiresAt: nextWeek,
-					UserID:    "dummy user id",
-				}
-
-				m.tokenGenerator.EXPECT().
-					Generate(gomock.Eq(expRefreshTokenClaims)).
-					Return("dummy refresh token", nil)
+					Generate(gomock.Eq("dummy user id")).
+					Return(tokensPair, nil)
 			},
 			assert: func(t *testing.T, res *auth.LoginOut, err error) {
 				assert.NoError(t, err)

@@ -4,14 +4,11 @@ package login
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/art-es/yet-another-service/internal/app/auth"
 	"github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/app/shared/models"
 )
-
-var getCurrentTime = time.Now
 
 type userRepository interface {
 	FindByEmail(ctx context.Context, email string) (*models.User, error)
@@ -22,7 +19,7 @@ type hashChecker interface {
 }
 
 type tokenGenerator interface {
-	Generate(claims *auth.TokenClaims) (string, error)
+	Generate(userID string) (*auth.TokenPair, error)
 }
 
 type Service struct {
@@ -61,20 +58,13 @@ func (s *Service) Login(ctx context.Context, req *auth.LoginIn) (*auth.LoginOut,
 		return nil, fmt.Errorf("check password by hash: %w", err)
 	}
 
-	now := getCurrentTime()
-
-	accessToken, err := s.tokenGenerator.Generate(auth.NewAccessTokenClaims(now, user.ID))
+	tokenPair, err := s.tokenGenerator.Generate(user.ID)
 	if err != nil {
-		return nil, fmt.Errorf("generate access token: %w", err)
-	}
-
-	refreshToken, err := s.tokenGenerator.Generate(auth.NewRefreshTokenClaims(now, user.ID))
-	if err != nil {
-		return nil, fmt.Errorf("generate refresh token: %w", err)
+		return nil, fmt.Errorf("generate tokens: %w", err)
 	}
 
 	return &auth.LoginOut{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+		AccessToken:  tokenPair.AccessToken,
+		RefreshToken: tokenPair.RefreshToken,
 	}, nil
 }

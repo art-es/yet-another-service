@@ -7,6 +7,11 @@ const (
 	refreshTokenExpiry = time.Hour * 24 * 7
 )
 
+type TokenPair struct {
+	AccessToken  string
+	RefreshToken string
+}
+
 type TokenClaims struct {
 	IssuedAt  time.Time
 	ExpiresAt time.Time

@@ -5,8 +5,8 @@ import (
 
 	"github.com/art-es/yet-another-service/internal/app/auth/login"
 	"github.com/art-es/yet-another-service/internal/app/auth/logout"
-	"github.com/art-es/yet-another-service/internal/app/auth/refresh"
 	"github.com/art-es/yet-another-service/internal/app/auth/signup"
+	authtoken "github.com/art-es/yet-another-service/internal/app/auth/token"
 	useractivation "github.com/art-es/yet-another-service/internal/app/user/activation"
 	passwordrecovery "github.com/art-es/yet-another-service/internal/app/user/password_recovery"
 	"github.com/art-es/yet-another-service/internal/core/mail"
@@ -51,17 +51,17 @@ func main() {
 	// App Layer
 	userActivationService := useractivation.NewService(config.userActivationURL, userActivationStorage, userStorage, userActivationMailer)
 	passwordRecoveryService := passwordrecovery.NewService(config.userPasswordRecoveryURL, userStorage, passwordRecoveryStorage, passwordRecoveryMailer, hashService)
+	authTokenService := authtoken.NewService(jwtService)
 	signupService := signup.NewService(hashService, userStorage, userActivationService)
-	loginService := login.NewService(userStorage, hashService, jwtService)
+	loginService := login.NewService(userStorage, hashService, authTokenService)
 	logoutService := logout.NewService(jwtService, authTokenBlackListStorage, logger)
-	refreshTokenService := refresh.NewService(jwtService)
 
 	// Transport Layer
 	signupHandler := signupTransport.NewHandler(signupService, logger, validator)
 	userActivateHandler := useractivateTransport.NewHandler(userActivationService, logger, validator)
 	loginHandler := loginTransport.NewHandler(loginService, logger, validator)
 	logoutHandler := logoutTransport.NewHandler(logoutService, logger, validator)
-	refreshHandler := refreshtokenTransport.NewHandler(refreshTokenService, logger)
+	refreshHandler := refreshtokenTransport.NewHandler(authTokenService, logger)
 	forgotPasswordHandler := forgotpasswordTransport.NewHandler(passwordRecoveryService, logger, validator)
 	recoverPasswordHandler := recoverpasswordTransport.NewHandler(passwordRecoveryService, logger, validator)
 

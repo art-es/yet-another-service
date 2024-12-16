@@ -5,9 +5,6 @@ import (
 	"net/url"
 	"os"
 	"slices"
-	"strconv"
-
-	driver_smtp "github.com/art-es/yet-another-service/internal/driver/smtp"
 
 	"github.com/art-es/yet-another-service/internal/core/log"
 )
@@ -28,7 +25,6 @@ type appConfig struct {
 	jwtSecret               string
 	userActivationURL       url.URL
 	userPasswordRecoveryURL url.URL
-	smtpConfig              driver_smtp.Config
 
 	logger log.Logger
 }
@@ -40,7 +36,6 @@ func getAppConfig(logger log.Logger) *appConfig {
 	c.initJWTSecret()
 	c.initUserActivationURL()
 	c.initUserPasswordRecoveryURL()
-	c.initSMTP()
 	return c
 }
 
@@ -121,19 +116,4 @@ func (c *appConfig) initUserPasswordRecoveryURL() {
 	}
 
 	c.userPasswordRecoveryURL = *u
-}
-
-func (c *appConfig) initSMTP() {
-	c.smtpConfig.Host = os.Getenv("SMTP_HOST")
-	c.smtpConfig.Port, _ = strconv.Atoi(os.Getenv("SMTP_PORT"))
-	c.smtpConfig.Username = os.Getenv("SMTP_USERNAME")
-	c.smtpConfig.Password = os.Getenv("SMTP_PASSWORD")
-
-	if c.smtpConfig.Host != "" && c.smtpConfig.Username != "" {
-		return
-	}
-
-	if c.appEnv != appEnvLocal {
-		c.logger.Panic().Msg("SMTP_HOST, SMTP_USERNAME are required")
-	}
 }

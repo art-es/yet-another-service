@@ -48,7 +48,7 @@ func (s *Service) doCreationTransaction(ctx context.Context, tx transaction.Tran
 		RecoveryURL: newRecoveryURL(s.baseRecoveryURl, recovery.Token),
 	}
 
-	if err := s.recoveryMailer.MailTo(user.Email, mailData); err != nil {
+	if err := s.recoveryMailer.MailTo(ctx, user.Email, mailData); err != nil {
 		return fmt.Errorf("mail recovery to user: %w", err)
 	}
 

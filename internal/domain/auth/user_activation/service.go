@@ -21,7 +21,7 @@ type userRepository interface {
 }
 
 type activationMailer interface {
-	MailTo(address string, data mail.UserActivationData) error
+	MailTo(ctx context.Context, address string, data mail.UserActivationData) error
 }
 
 type Service struct {

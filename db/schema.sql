@@ -21,3 +21,12 @@ CREATE TABLE password_recoveries (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE mails (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    address VARCHAR(255) NOT NULL,
+    subject TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    mailed_at TIMESTAMP WITH TIME ZONE
+);

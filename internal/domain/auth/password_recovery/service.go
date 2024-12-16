@@ -23,7 +23,7 @@ type recoveryRepository interface {
 }
 
 type recoveryMailer interface {
-	MailTo(address string, data mail.PasswordRecoveryData) error
+	MailTo(ctx context.Context, address string, data mail.PasswordRecoveryData) error
 }
 
 type hashService interface {

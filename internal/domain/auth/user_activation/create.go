@@ -23,7 +23,7 @@ func (s *Service) CreateActivation(ctx context.Context, tx transaction.Transacti
 		ActivationURL: newActivationURL(s.baseActivationURL, activation.Token),
 	}
 
-	if err := s.activationMailer.MailTo(user.Email, mailData); err != nil {
+	if err := s.activationMailer.MailTo(ctx, user.Email, mailData); err != nil {
 		return fmt.Errorf("mail activation to user: %w", err)
 	}
 

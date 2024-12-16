@@ -177,6 +177,6 @@ func (m *createRecoveryMocks) expectMailRecovery(err error) {
 	}
 
 	m.recoveryMailer.EXPECT().
-		MailTo(gomock.Eq("iivan@example.com"), gomock.Eq(expectedData)).
+		MailTo(gomock.Any(), gomock.Eq("iivan@example.com"), gomock.Eq(expectedData)).
 		Return(err)
 }

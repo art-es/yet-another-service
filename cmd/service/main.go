@@ -14,7 +14,6 @@ import (
 	driver_gin "github.com/art-es/yet-another-service/internal/driver/gin"
 	driver_jwt "github.com/art-es/yet-another-service/internal/driver/jwt"
 	driver_postgres "github.com/art-es/yet-another-service/internal/driver/postgres"
-	driver_smtp "github.com/art-es/yet-another-service/internal/driver/smtp"
 	driver_validator "github.com/art-es/yet-another-service/internal/driver/validator"
 	driver_zerolog "github.com/art-es/yet-another-service/internal/driver/zerolog"
 	storage_postgres "github.com/art-es/yet-another-service/internal/storage/postgres"
@@ -37,17 +36,17 @@ func main() {
 	hashService := driver_bcrypt.NewHashService()
 	postgresDB := driver_postgres.Connect(config.postgresURL)
 	jwtService := driver_jwt.NewService(config.jwtSecret)
-	smtpService := driver_smtp.NewService(config.smtpConfig)
 
 	// Data Layer
 	userStorage := storage_postgres.NewUserStorage(postgresDB)
 	userActivationStorage := storage_postgres.NewUserActivationStorage(postgresDB)
 	passwordRecoveryStorage := storage_postgres.NewPasswordRecoveryStorage(postgresDB)
+	mailStorage := storage_postgres.NewMailStorage(postgresDB)
 	authTokenBlackListStorage := storage_redis.NewAuthTokenBlackListStorage()
 
 	// Mailers
-	userActivationMailer := mail.NewUserActivationMailer(smtpService)
-	passwordRecoveryMailer := mail.NewPasswordRecoveryMailer(smtpService)
+	userActivationMailer := mail.NewUserActivationMailer(mailStorage)
+	passwordRecoveryMailer := mail.NewPasswordRecoveryMailer(mailStorage)
 
 	// App Layer
 	userActivationService := domain_user_activation.NewService(config.userActivationURL, userActivationStorage, userStorage, userActivationMailer)

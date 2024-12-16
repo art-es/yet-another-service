@@ -179,17 +179,17 @@ func (m *MockrecoveryMailer) EXPECT() *MockrecoveryMailerMockRecorder {
 }
 
 // MailTo mocks base method.
-func (m *MockrecoveryMailer) MailTo(address string, data mail.PasswordRecoveryData) error {
+func (m *MockrecoveryMailer) MailTo(ctx context.Context, address string, data mail.PasswordRecoveryData) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MailTo", address, data)
+	ret := m.ctrl.Call(m, "MailTo", ctx, address, data)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // MailTo indicates an expected call of MailTo.
-func (mr *MockrecoveryMailerMockRecorder) MailTo(address, data any) *gomock.Call {
+func (mr *MockrecoveryMailerMockRecorder) MailTo(ctx, address, data any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MailTo", reflect.TypeOf((*MockrecoveryMailer)(nil).MailTo), address, data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MailTo", reflect.TypeOf((*MockrecoveryMailer)(nil).MailTo), ctx, address, data)
 }
 
 // MockhashService is a mock of hashService interface.

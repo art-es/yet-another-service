@@ -149,15 +149,15 @@ func (m *MockactivationMailer) EXPECT() *MockactivationMailerMockRecorder {
 }
 
 // MailTo mocks base method.
-func (m *MockactivationMailer) MailTo(address string, data mail.UserActivationData) error {
+func (m *MockactivationMailer) MailTo(ctx context.Context, address string, data mail.UserActivationData) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MailTo", address, data)
+	ret := m.ctrl.Call(m, "MailTo", ctx, address, data)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // MailTo indicates an expected call of MailTo.
-func (mr *MockactivationMailerMockRecorder) MailTo(address, data any) *gomock.Call {
+func (mr *MockactivationMailerMockRecorder) MailTo(ctx, address, data any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MailTo", reflect.TypeOf((*MockactivationMailer)(nil).MailTo), address, data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MailTo", reflect.TypeOf((*MockactivationMailer)(nil).MailTo), ctx, address, data)
 }

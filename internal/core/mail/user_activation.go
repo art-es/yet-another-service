@@ -2,6 +2,7 @@ package mail
 
 import (
 	"bytes"
+	"context"
 	_ "embed"
 	"fmt"
 	"html/template"
@@ -20,24 +21,20 @@ type UserActivationData struct {
 }
 
 type UserActivationMailer struct {
-	mailer mailer
+	mailRepository mailRepository
 }
 
-func NewUserActivationMailer(mailer mailer) *UserActivationMailer {
+func NewUserActivationMailer(mailRepository mailRepository) *UserActivationMailer {
 	return &UserActivationMailer{
-		mailer: mailer,
+		mailRepository: mailRepository,
 	}
 }
 
-func (s *UserActivationMailer) MailTo(address string, data UserActivationData) error {
+func (s *UserActivationMailer) MailTo(ctx context.Context, address string, data UserActivationData) error {
 	content := &bytes.Buffer{}
 	if err := userActivationTemplate.Execute(content, data); err != nil {
 		return fmt.Errorf("execute template: %w", err)
 	}
 
-	if err := s.mailer.MailTo(address, userActivationSubject, content.String()); err != nil {
-		return fmt.Errorf("mail: %w", err)
-	}
-
-	return nil
+	return saveMail(s.mailRepository, ctx, address, userActivationSubject, content.String())
 }

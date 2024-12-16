@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -8,6 +9,7 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/art-es/yet-another-service/internal/core/mail/mock"
+	"github.com/art-es/yet-another-service/internal/domain/shared/models"
 )
 
 func TestUserPasswordRecoveryMailer(t *testing.T) {
@@ -24,25 +26,41 @@ func TestUserPasswordRecoveryMailer(t *testing.T) {
 
 	for _, tt := range []struct {
 		name   string
-		setup  func(mailer *mock.MockMailer)
+		setup  func(mailRepository *mock.MockmailRepository)
 		assert func(t *testing.T, err error)
 	}{
 		{
 			name: "mail error",
-			setup: func(mailer *mock.MockMailer) {
-				mailer.EXPECT().
-					MailTo(gomock.Eq(address), gomock.Eq(passwordRecoverySubject), gomock.Eq(content)).
+			setup: func(mailRepository *mock.MockmailRepository) {
+				expectedMails := []models.Mail{
+					{
+						Address: address,
+						Subject: passwordRecoverySubject,
+						Content: content,
+					},
+				}
+
+				mailRepository.EXPECT().
+					Save(gomock.Any(), gomock.Eq(expectedMails)).
 					Return(errors.New("dummy error"))
 			},
 			assert: func(t *testing.T, err error) {
-				assert.EqualError(t, err, "mail: dummy error")
+				assert.EqualError(t, err, "save mail: dummy error")
 			},
 		},
 		{
 			name: "ok",
-			setup: func(mailer *mock.MockMailer) {
-				mailer.EXPECT().
-					MailTo(gomock.Eq(address), gomock.Eq(passwordRecoverySubject), gomock.Eq(content)).
+			setup: func(mailRepository *mock.MockmailRepository) {
+				expectedMails := []models.Mail{
+					{
+						Address: address,
+						Subject: passwordRecoverySubject,
+						Content: content,
+					},
+				}
+
+				mailRepository.EXPECT().
+					Save(gomock.Any(), gomock.Eq(expectedMails)).
 					Return(nil)
 			},
 			assert: func(t *testing.T, err error) {
@@ -54,12 +72,12 @@ func TestUserPasswordRecoveryMailer(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			mockBaseMailer := mock.NewMockMailer(ctrl)
+			mockMailRepository := mock.NewMockmailRepository(ctrl)
 
-			tt.setup(mockBaseMailer)
+			tt.setup(mockMailRepository)
 
-			err := NewPasswordRecoveryMailer(mockBaseMailer).
-				MailTo(address, PasswordRecoveryData{RecoveryURL: recoveryURL})
+			err := NewPasswordRecoveryMailer(mockMailRepository).
+				MailTo(context.Background(), address, PasswordRecoveryData{RecoveryURL: recoveryURL})
 
 			tt.assert(t, err)
 		})

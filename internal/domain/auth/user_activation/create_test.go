@@ -102,6 +102,6 @@ func (m createActivationMocks) expectMailActivation(err error) {
 	}
 
 	m.activationMailer.EXPECT().
-		MailTo(gomock.Eq("iivan@example.com"), gomock.Eq(expectedMailData)).
+		MailTo(gomock.Any(), gomock.Eq("iivan@example.com"), gomock.Eq(expectedMailData)).
 		Return(err)
 }

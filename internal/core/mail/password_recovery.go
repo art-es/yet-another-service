@@ -2,6 +2,7 @@ package mail
 
 import (
 	"bytes"
+	"context"
 	_ "embed"
 	"fmt"
 	"html/template"
@@ -20,24 +21,20 @@ type PasswordRecoveryData struct {
 }
 
 type PasswordRecoveryMailer struct {
-	mailer mailer
+	mailRepository mailRepository
 }
 
-func NewPasswordRecoveryMailer(mailer mailer) *PasswordRecoveryMailer {
+func NewPasswordRecoveryMailer(mailRepository mailRepository) *PasswordRecoveryMailer {
 	return &PasswordRecoveryMailer{
-		mailer: mailer,
+		mailRepository: mailRepository,
 	}
 }
 
-func (s *PasswordRecoveryMailer) MailTo(address string, data PasswordRecoveryData) error {
+func (s *PasswordRecoveryMailer) MailTo(ctx context.Context, address string, data PasswordRecoveryData) error {
 	content := &bytes.Buffer{}
 	if err := passwordRecoveryTemplate.Execute(content, data); err != nil {
 		return fmt.Errorf("execute template: %w", err)
 	}
 
-	if err := s.mailer.MailTo(address, passwordRecoverySubject, content.String()); err != nil {
-		return fmt.Errorf("mail: %w", err)
-	}
-
-	return nil
+	return saveMail(s.mailRepository, ctx, address, passwordRecoverySubject, content.String())
 }

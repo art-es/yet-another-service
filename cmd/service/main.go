@@ -35,7 +35,7 @@ func main() {
 	pqDB := pqDriver.Connect(config.postgresURL)
 	validator := validatorDriver.New()
 	hashService := bcryptDriver.NewHashService()
-	jwtService := jwtDriver.NewService(config.jwtSecret)
+	jwtService := jwtDriver.NewService(config.jwtSecret, logger)
 
 	// Data Layer
 	userStorage := pqstorage.NewUserStorage(pqDB)

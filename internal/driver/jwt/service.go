@@ -1,21 +1,25 @@
 package jwt
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v4"
 
 	"github.com/art-es/yet-another-service/internal/app/auth"
-	"github.com/art-es/yet-another-service/internal/app/shared/errors"
+	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
+	"github.com/art-es/yet-another-service/internal/core/log"
 )
 
 type Service struct {
 	secret []byte
+	logger log.Logger
 }
 
-func NewService(secret string) *Service {
+func NewService(secret string, logger log.Logger) *Service {
 	return &Service{
 		secret: []byte(secret),
+		logger: logger.With().Str("package", "driver/jwt").Logger(),
 	}
 }
 
@@ -44,18 +48,22 @@ func (s *Service) Generate(claims *auth.TokenClaims) (string, error) {
 func (s *Service) Parse(signedToken string) (*auth.TokenClaims, error) {
 	token, err := jwt.ParseWithClaims(signedToken, &internalClaims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			s.logger.Error().
+				Str("signing_method", fmt.Sprintf("%v", token.Header["alg"])).
+				Msg("unexpected signing method")
+
+			return nil, errors.New("unexpected signing method")
 		}
 
 		return s.secret, nil
 	})
 	if err != nil {
-		return nil, errors.ErrInvalidAuthToken
+		return nil, apperrors.ErrInvalidAuthToken
 	}
 
 	claims, ok := token.Claims.(*internalClaims)
 	if !ok || !token.Valid {
-		return nil, errors.ErrInvalidAuthToken
+		return nil, apperrors.ErrInvalidAuthToken
 	}
 
 	return &auth.TokenClaims{

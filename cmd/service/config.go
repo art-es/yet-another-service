@@ -22,6 +22,7 @@ var availableAppEnv = []string{
 type appConfig struct {
 	appEnv                  string
 	postgresURL             string
+	redisAddr               string
 	jwtSecret               string
 	userActivationURL       url.URL
 	userPasswordRecoveryURL url.URL
@@ -66,6 +67,18 @@ func (c *appConfig) initPostgresURL() {
 	}
 
 	c.postgresURL = "http://postgres:postgres@127.0.0.1:5432/master?ssldisabled=true"
+}
+
+func (c *appConfig) initRedisAddr() {
+	if c.postgresURL = os.Getenv("REDIS_ADDR"); c.postgresURL != "" {
+		return
+	}
+
+	if c.appEnv != appEnvLocal {
+		c.logger.Panic().Msg("REDIS_ADDR is required")
+	}
+
+	c.postgresURL = "127.0.0.1:6379"
 }
 
 func (c *appConfig) initJWTSecret() {

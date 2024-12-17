@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 
+	"github.com/art-es/yet-another-service/internal/driver/redis"
+
 	"github.com/art-es/yet-another-service/internal/app/auth/login"
 	"github.com/art-es/yet-another-service/internal/app/auth/logout"
 	"github.com/art-es/yet-another-service/internal/app/auth/signup"
@@ -33,6 +35,7 @@ func main() {
 
 	// Drivers
 	pqDB := pqDriver.Connect(config.postgresURL)
+	rdDB := redis.Connect(config.redisAddr)
 	validator := validatorDriver.New()
 	hashService := bcryptDriver.NewHashService()
 	jwtService := jwtDriver.NewService(config.jwtSecret, logger)
@@ -42,7 +45,7 @@ func main() {
 	userActivationStorage := pqstorage.NewUserActivationStorage(pqDB)
 	passwordRecoveryStorage := pqstorage.NewPasswordRecoveryStorage(pqDB)
 	mailStorage := pqstorage.NewMailStorage(pqDB)
-	authTokenBlackListStorage := redisstorage.NewAuthTokenBlackListStorage()
+	authTokenBlackListStorage := redisstorage.NewAuthTokenBlackListStorage(rdDB)
 
 	// Mailers
 	userActivationMailer := mail.NewUserActivationMailer(mailStorage)
@@ -51,10 +54,10 @@ func main() {
 	// App Layer
 	userActivationService := useractivation.NewService(config.userActivationURL, userActivationStorage, userStorage, userActivationMailer)
 	passwordRecoveryService := passwordrecovery.NewService(config.userPasswordRecoveryURL, userStorage, passwordRecoveryStorage, passwordRecoveryMailer, hashService)
-	authTokenService := authtoken.NewService(jwtService)
+	authTokenService := authtoken.NewService(jwtService, authTokenBlackListStorage)
 	signupService := signup.NewService(hashService, userStorage, userActivationService)
 	loginService := login.NewService(userStorage, hashService, authTokenService)
-	logoutService := logout.NewService(jwtService, authTokenBlackListStorage, logger)
+	logoutService := logout.NewService(authTokenService, logger)
 
 	// Transport Layer
 	signupHandler := signupTransport.NewHandler(signupService, logger, validator)

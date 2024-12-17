@@ -10,10 +10,12 @@
 package mock
 
 import (
-	http "net/http"
+	context "context"
+	http0 "net/http"
 	reflect "reflect"
 	time "time"
 
+	http "github.com/art-es/yet-another-service/internal/core/http"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -85,10 +87,10 @@ func (mr *MockContextMockRecorder) Err() *gomock.Call {
 }
 
 // Request mocks base method.
-func (m *MockContext) Request() *http.Request {
+func (m *MockContext) Request() *http0.Request {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Request")
-	ret0, _ := ret[0].(*http.Request)
+	ret0, _ := ret[0].(*http0.Request)
 	return ret0
 }
 
@@ -99,10 +101,10 @@ func (mr *MockContextMockRecorder) Request() *gomock.Call {
 }
 
 // ResponseWriter mocks base method.
-func (m *MockContext) ResponseWriter() http.ResponseWriter {
+func (m *MockContext) ResponseWriter() http0.ResponseWriter {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ResponseWriter")
-	ret0, _ := ret[0].(http.ResponseWriter)
+	ret0, _ := ret[0].(http0.ResponseWriter)
 	return ret0
 }
 
@@ -124,4 +126,18 @@ func (m *MockContext) Value(key any) any {
 func (mr *MockContextMockRecorder) Value(key any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Value", reflect.TypeOf((*MockContext)(nil).Value), key)
+}
+
+// With mocks base method.
+func (m *MockContext) With(ctx context.Context) http.Context {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "With", ctx)
+	ret0, _ := ret[0].(http.Context)
+	return ret0
+}
+
+// With indicates an expected call of With.
+func (mr *MockContextMockRecorder) With(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "With", reflect.TypeOf((*MockContext)(nil).With), ctx)
 }

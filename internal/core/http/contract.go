@@ -10,4 +10,7 @@ type Context interface {
 	context.Context
 	Request() *http.Request
 	ResponseWriter() http.ResponseWriter
+	With(ctx context.Context) Context
 }
+
+type Handler func(ctx Context)

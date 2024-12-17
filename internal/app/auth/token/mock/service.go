@@ -10,7 +10,9 @@
 package mock
 
 import (
+	context "context"
 	reflect "reflect"
+	time "time"
 
 	auth "github.com/art-es/yet-another-service/internal/app/auth"
 	gomock "go.uber.org/mock/gomock"
@@ -68,4 +70,57 @@ func (m *MockjwtService) Parse(token string) (*auth.TokenClaims, error) {
 func (mr *MockjwtServiceMockRecorder) Parse(token any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Parse", reflect.TypeOf((*MockjwtService)(nil).Parse), token)
+}
+
+// MockblackList is a mock of blackList interface.
+type MockblackList struct {
+	ctrl     *gomock.Controller
+	recorder *MockblackListMockRecorder
+	isgomock struct{}
+}
+
+// MockblackListMockRecorder is the mock recorder for MockblackList.
+type MockblackListMockRecorder struct {
+	mock *MockblackList
+}
+
+// NewMockblackList creates a new mock instance.
+func NewMockblackList(ctrl *gomock.Controller) *MockblackList {
+	mock := &MockblackList{ctrl: ctrl}
+	mock.recorder = &MockblackListMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockblackList) EXPECT() *MockblackListMockRecorder {
+	return m.recorder
+}
+
+// Add mocks base method.
+func (m *MockblackList) Add(ctx context.Context, token string, ttl time.Duration) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Add", ctx, token, ttl)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Add indicates an expected call of Add.
+func (mr *MockblackListMockRecorder) Add(ctx, token, ttl any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add", reflect.TypeOf((*MockblackList)(nil).Add), ctx, token, ttl)
+}
+
+// Has mocks base method.
+func (m *MockblackList) Has(ctx context.Context, token string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Has", ctx, token)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Has indicates an expected call of Has.
+func (mr *MockblackListMockRecorder) Has(ctx, token any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Has", reflect.TypeOf((*MockblackList)(nil).Has), ctx, token)
 }

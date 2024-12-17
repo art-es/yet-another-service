@@ -39,7 +39,7 @@ func TestHandler(t *testing.T) {
 				req.Header.Set("Authorization", "Bearer dummy refresh token")
 
 				authSvc.EXPECT().
-					Refresh(gomock.Eq("dummy refresh token")).
+					Refresh(gomock.Any(), gomock.Eq("dummy refresh token")).
 					Return("", apperrors.ErrInvalidAuthToken)
 			},
 			assert: func(t *testing.T, res *httptest.ResponseRecorder, logs []string) {
@@ -56,7 +56,7 @@ func TestHandler(t *testing.T) {
 				req.Header.Set("Authorization", "Bearer dummy refresh token")
 
 				authSvc.EXPECT().
-					Refresh(gomock.Eq("dummy refresh token")).
+					Refresh(gomock.Any(), gomock.Eq("dummy refresh token")).
 					Return("", errors.New("auth service dummy error"))
 			},
 			assert: func(t *testing.T, res *httptest.ResponseRecorder, logs []string) {
@@ -75,7 +75,7 @@ func TestHandler(t *testing.T) {
 				req.Header.Set("Authorization", "Bearer dummy refresh token")
 
 				authSvc.EXPECT().
-					Refresh(gomock.Eq("dummy refresh token")).
+					Refresh(gomock.Any(), gomock.Eq("dummy refresh token")).
 					Return("dummy access token", nil)
 			},
 			assert: func(t *testing.T, res *httptest.ResponseRecorder, logs []string) {

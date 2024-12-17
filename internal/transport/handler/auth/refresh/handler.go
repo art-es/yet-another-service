@@ -2,6 +2,7 @@
 package refresh
 
 import (
+	"context"
 	"errors"
 	nethttp "net/http"
 
@@ -11,7 +12,7 @@ import (
 )
 
 type authService interface {
-	Refresh(refreshToken string) (string, error)
+	Refresh(ctx context.Context, refreshToken string) (string, error)
 }
 
 type response struct {
@@ -40,7 +41,7 @@ func (h *Handler) Handle(ctx http.Context) {
 		return
 	}
 
-	accessToken, err := h.authService.Refresh(refreshToken)
+	accessToken, err := h.authService.Refresh(ctx, refreshToken)
 
 	switch {
 	case err == nil:

@@ -10,6 +10,7 @@
 package mock
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
@@ -40,16 +41,16 @@ func (m *MockauthService) EXPECT() *MockauthServiceMockRecorder {
 }
 
 // Refresh mocks base method.
-func (m *MockauthService) Refresh(refreshToken string) (string, error) {
+func (m *MockauthService) Refresh(ctx context.Context, refreshToken string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Refresh", refreshToken)
+	ret := m.ctrl.Call(m, "Refresh", ctx, refreshToken)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Refresh indicates an expected call of Refresh.
-func (mr *MockauthServiceMockRecorder) Refresh(refreshToken any) *gomock.Call {
+func (mr *MockauthServiceMockRecorder) Refresh(ctx, refreshToken any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Refresh", reflect.TypeOf((*MockauthService)(nil).Refresh), refreshToken)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Refresh", reflect.TypeOf((*MockauthService)(nil).Refresh), ctx, refreshToken)
 }

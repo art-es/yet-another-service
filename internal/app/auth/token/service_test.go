@@ -1,6 +1,7 @@
 package token
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -224,7 +225,7 @@ func TestRefresh(t *testing.T) {
 			}
 
 			service := NewService(m.jwtService)
-			accessToken, err := service.Refresh("dummy refresh token")
+			accessToken, err := service.Refresh(context.Background(), "dummy refresh token")
 
 			if tt.assert != nil {
 				tt.assert(t, accessToken, err)

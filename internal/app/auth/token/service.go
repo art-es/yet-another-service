@@ -3,6 +3,7 @@ package token
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -101,10 +102,13 @@ func (s *Service) Invalidate(ctx context.Context, token string) error {
 
 	tokenClaims, err := s.jwtService.Parse(token)
 	if err != nil {
-		return fmt.Errorf("verify token: %w", err)
+		return fmt.Errorf("parse token: %w", err)
 	}
 
-	blackListTTL := tokenClaims.ExpiresAt.Sub(now)
+	blackListTTL := tokenClaims.ExpiresAt.Sub(now) * -1
+	if blackListTTL < 0 {
+		return errors.New("black list TTL is negative")
+	}
 
 	if err = s.blackList.Add(ctx, token, blackListTTL); err != nil {
 		return fmt.Errorf("add to black list: %w", err)

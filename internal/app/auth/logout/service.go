@@ -1,3 +1,4 @@
+//go:generate mockgen -source=service.go -destination=mock/service.go -package=mock
 package logout
 
 import (
@@ -34,7 +35,7 @@ func (s *Service) Logout(ctx context.Context, req *auth.LogoutIn) error {
 
 	if req.AccessToken != nil {
 		if err := s.tokenService.Invalidate(ctx, *req.AccessToken); err != nil {
-			s.logger.Warn().Err(err).Msg("acccess token invalidate error")
+			s.logger.Warn().Err(err).Msg("invalidate acccess token error")
 		}
 	}
 

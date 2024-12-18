@@ -7,13 +7,14 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/art-es/yet-another-service/internal/core/pointer"
+
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
 	"github.com/art-es/yet-another-service/internal/app/auth"
 	"github.com/art-es/yet-another-service/internal/app/auth/logout/mock"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
-	"github.com/art-es/yet-another-service/internal/util/pointer"
 )
 
 func TestLogout(t *testing.T) {

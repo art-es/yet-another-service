@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/art-es/yet-another-service/internal/core/pointer"
+
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
@@ -19,7 +21,6 @@ import (
 	mockvalidation "github.com/art-es/yet-another-service/internal/core/validation/mock"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
 	"github.com/art-es/yet-another-service/internal/transport/handler/auth/logout/mock"
-	"github.com/art-es/yet-another-service/internal/util/pointer"
 )
 
 func TestHandler(t *testing.T) {

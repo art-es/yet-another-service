@@ -16,40 +16,40 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockauthService is a mock of authService interface.
-type MockauthService struct {
+// MockrecoveryService is a mock of recoveryService interface.
+type MockrecoveryService struct {
 	ctrl     *gomock.Controller
-	recorder *MockauthServiceMockRecorder
+	recorder *MockrecoveryServiceMockRecorder
 	isgomock struct{}
 }
 
-// MockauthServiceMockRecorder is the mock recorder for MockauthService.
-type MockauthServiceMockRecorder struct {
-	mock *MockauthService
+// MockrecoveryServiceMockRecorder is the mock recorder for MockrecoveryService.
+type MockrecoveryServiceMockRecorder struct {
+	mock *MockrecoveryService
 }
 
-// NewMockauthService creates a new mock instance.
-func NewMockauthService(ctrl *gomock.Controller) *MockauthService {
-	mock := &MockauthService{ctrl: ctrl}
-	mock.recorder = &MockauthServiceMockRecorder{mock}
+// NewMockrecoveryService creates a new mock instance.
+func NewMockrecoveryService(ctrl *gomock.Controller) *MockrecoveryService {
+	mock := &MockrecoveryService{ctrl: ctrl}
+	mock.recorder = &MockrecoveryServiceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockauthService) EXPECT() *MockauthServiceMockRecorder {
+func (m *MockrecoveryService) EXPECT() *MockrecoveryServiceMockRecorder {
 	return m.recorder
 }
 
-// CreateRecovery mocks base method.
-func (m *MockauthService) CreateRecovery(ctx context.Context, email string) error {
+// Create mocks base method.
+func (m *MockrecoveryService) Create(ctx context.Context, email string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateRecovery", ctx, email)
+	ret := m.ctrl.Call(m, "Create", ctx, email)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// CreateRecovery indicates an expected call of CreateRecovery.
-func (mr *MockauthServiceMockRecorder) CreateRecovery(ctx, email any) *gomock.Call {
+// Create indicates an expected call of Create.
+func (mr *MockrecoveryServiceMockRecorder) Create(ctx, email any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRecovery", reflect.TypeOf((*MockauthService)(nil).CreateRecovery), ctx, email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockrecoveryService)(nil).Create), ctx, email)
 }

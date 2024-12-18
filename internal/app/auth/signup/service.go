@@ -21,7 +21,7 @@ type userRepository interface {
 }
 
 type activationService interface {
-	CreateActivation(ctx context.Context, tx transaction.Transaction, user *models.User) error
+	Create(ctx context.Context, tx transaction.Transaction, user *models.User) error
 }
 
 type Service struct {
@@ -82,7 +82,7 @@ func (s *Service) doTransaction(ctx context.Context, tx transaction.Transaction,
 		return fmt.Errorf("save user in repository: %w", err)
 	}
 
-	if err = s.activationService.CreateActivation(ctx, tx, user); err != nil {
+	if err = s.activationService.Create(ctx, tx, user); err != nil {
 		return fmt.Errorf("create activation: %w", err)
 	}
 

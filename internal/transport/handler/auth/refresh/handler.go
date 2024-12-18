@@ -8,6 +8,7 @@ import (
 
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/http"
+	"github.com/art-es/yet-another-service/internal/core/http/util"
 	"github.com/art-es/yet-another-service/internal/core/log"
 )
 
@@ -35,9 +36,9 @@ func NewHandler(
 }
 
 func (h *Handler) Handle(ctx http.Context) {
-	refreshToken, ok := http.GetAuthorizationToken(ctx)
+	refreshToken, ok := util.GetAuthorizationToken(ctx)
 	if !ok {
-		http.RespondUnauthorized(ctx)
+		util.RespondUnauthorized(ctx)
 		return
 	}
 
@@ -45,11 +46,11 @@ func (h *Handler) Handle(ctx http.Context) {
 
 	switch {
 	case err == nil:
-		http.Respond(ctx, nethttp.StatusOK, response{AccessToken: accessToken})
+		util.Respond(ctx, nethttp.StatusOK, response{AccessToken: accessToken})
 	case errors.Is(err, apperrors.ErrInvalidAuthToken):
-		http.RespondUnauthorized(ctx)
+		util.RespondUnauthorized(ctx)
 	default:
 		h.logger.Error().Err(err).Msg("refresh error on auth service")
-		http.RespondInternalError(ctx)
+		util.RespondInternalError(ctx)
 	}
 }

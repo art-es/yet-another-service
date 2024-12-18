@@ -134,16 +134,16 @@ func (m *MockactivationService) EXPECT() *MockactivationServiceMockRecorder {
 	return m.recorder
 }
 
-// CreateActivation mocks base method.
-func (m *MockactivationService) CreateActivation(ctx context.Context, tx transaction.Transaction, user *models.User) error {
+// Create mocks base method.
+func (m *MockactivationService) Create(ctx context.Context, tx transaction.Transaction, user *models.User) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateActivation", ctx, tx, user)
+	ret := m.ctrl.Call(m, "Create", ctx, tx, user)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// CreateActivation indicates an expected call of CreateActivation.
-func (mr *MockactivationServiceMockRecorder) CreateActivation(ctx, tx, user any) *gomock.Call {
+// Create indicates an expected call of Create.
+func (mr *MockactivationServiceMockRecorder) Create(ctx, tx, user any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateActivation", reflect.TypeOf((*MockactivationService)(nil).CreateActivation), ctx, tx, user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockactivationService)(nil).Create), ctx, tx, user)
 }

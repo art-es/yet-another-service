@@ -8,12 +8,13 @@ import (
 
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/http"
+	"github.com/art-es/yet-another-service/internal/core/http/util"
 	"github.com/art-es/yet-another-service/internal/core/log"
 	"github.com/art-es/yet-another-service/internal/core/validation"
 )
 
-type authService interface {
-	CreateRecovery(ctx context.Context, email string) error
+type recoveryService interface {
+	Create(ctx context.Context, email string) error
 }
 
 type request struct {
@@ -21,47 +22,47 @@ type request struct {
 }
 
 type Handler struct {
-	authService authService
-	logger      log.Logger
-	validator   validation.Validator
+	recoveryService recoveryService
+	logger          log.Logger
+	validator       validation.Validator
 }
 
 func NewHandler(
-	authService authService,
+	recoveryService recoveryService,
 	logger log.Logger,
 	validator validation.Validator,
 ) *Handler {
 	return &Handler{
-		authService: authService,
-		logger:      logger,
-		validator:   validator,
+		recoveryService: recoveryService,
+		logger:          logger,
+		validator:       validator,
 	}
 }
 
 func (h *Handler) Handle(ctx http.Context) {
 	req, err := h.parseRequest(ctx)
 	if err != nil {
-		http.RespondBadRequest(ctx, err.Error())
+		util.RespondBadRequest(ctx, err.Error())
 		return
 	}
 
-	err = h.authService.CreateRecovery(ctx, req.Email)
+	err = h.recoveryService.Create(ctx, req.Email)
 
 	switch {
 	case err == nil:
-		http.Respond(ctx, nethttp.StatusOK, struct{}{})
+		util.Respond(ctx, nethttp.StatusOK, struct{}{})
 	case errors.Is(err, apperrors.ErrUserNotFound):
-		http.RespondBadRequest(ctx, "user with this email not found")
+		util.RespondBadRequest(ctx, "user with this email not found")
 	default:
 		h.logger.Error().Err(err).Msg("create recovery error on auth service")
-		http.RespondInternalError(ctx)
+		util.RespondInternalError(ctx)
 	}
 }
 
 func (h *Handler) parseRequest(ctx http.Context) (*request, error) {
 	req := &request{}
 
-	if err := http.EnrichRequestBody(ctx, req); err != nil {
+	if err := util.EnrichRequestBody(ctx, req); err != nil {
 		return nil, err
 	}
 

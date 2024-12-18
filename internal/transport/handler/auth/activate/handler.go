@@ -8,6 +8,7 @@ import (
 
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/http"
+	httputil "github.com/art-es/yet-another-service/internal/core/http/util"
 	"github.com/art-es/yet-another-service/internal/core/log"
 	"github.com/art-es/yet-another-service/internal/core/validation"
 )
@@ -37,7 +38,7 @@ func NewHandler(
 func (h *Handler) Handle(ctx http.Context) {
 	token, err := h.parseToken(ctx)
 	if err != nil {
-		http.RespondNotFound(ctx)
+		httputil.RespondNotFound(ctx)
 		return
 	}
 
@@ -45,12 +46,12 @@ func (h *Handler) Handle(ctx http.Context) {
 
 	switch {
 	case err == nil:
-		http.Respond(ctx, nethttp.StatusOK, struct{}{})
+		httputil.Respond(ctx, nethttp.StatusOK, struct{}{})
 	case errors.Is(err, apperrors.ErrUserActivationNotFound):
-		http.RespondNotFound(ctx)
+		httputil.RespondNotFound(ctx)
 	default:
 		h.logger.Error().Err(err).Msg("activate error on auth service")
-		http.RespondInternalError(ctx)
+		httputil.RespondInternalError(ctx)
 	}
 }
 

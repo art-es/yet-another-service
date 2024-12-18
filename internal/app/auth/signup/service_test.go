@@ -130,7 +130,7 @@ func TestService(t *testing.T) {
 				}
 
 				m.activationService.EXPECT().
-					CreateActivation(gomock.Any(), gomock.Not(nil), gomock.Eq(expectedUser)).
+					Create(gomock.Any(), gomock.Not(nil), gomock.Eq(expectedUser)).
 					Return(errors.New(dummyErrorMessage))
 			},
 			assert: func(t *testing.T, err error) {
@@ -173,7 +173,7 @@ func TestService(t *testing.T) {
 				}
 
 				m.activationService.EXPECT().
-					CreateActivation(gomock.Any(), gomock.Not(nil), gomock.Eq(expectedUser)).
+					Create(gomock.Any(), gomock.Not(nil), gomock.Eq(expectedUser)).
 					Return(nil)
 			},
 			assert: func(t *testing.T, err error) {
@@ -212,7 +212,7 @@ func TestService(t *testing.T) {
 				}
 
 				m.activationService.EXPECT().
-					CreateActivation(gomock.Any(), gomock.Not(nil), gomock.Eq(expectedUser)).
+					Create(gomock.Any(), gomock.Not(nil), gomock.Eq(expectedUser)).
 					Return(nil)
 			},
 			assert: func(t *testing.T, err error) {

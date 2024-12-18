@@ -11,7 +11,7 @@ import (
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
-func (s *Service) CreateRecovery(ctx context.Context, email string) error {
+func (s *Service) Create(ctx context.Context, email string) error {
 	user, err := s.userRepository.FindByEmail(ctx, email)
 	if err != nil {
 		return fmt.Errorf("find user by email in repository: %w", err)

@@ -22,7 +22,7 @@ import (
 func TestHandler(t *testing.T) {
 	for _, tt := range []struct {
 		name   string
-		setup  func(authSvc *mock.MockauthService, validator *mockvalidation.MockValidator, req *http.Request)
+		setup  func(recSvc *mock.MockrecoveryService, validator *mockvalidation.MockValidator, req *http.Request)
 		assert func(t *testing.T, res *httptest.ResponseRecorder, logs []string)
 	}{
 		{
@@ -37,7 +37,7 @@ func TestHandler(t *testing.T) {
 		},
 		{
 			name: "invalid content type",
-			setup: func(authSvc *mock.MockauthService, validator *mockvalidation.MockValidator, req *http.Request) {
+			setup: func(recSvc *mock.MockrecoveryService, validator *mockvalidation.MockValidator, req *http.Request) {
 				req.Body = io.NopCloser(strings.NewReader(`foo`))
 			},
 			assert: func(t *testing.T, res *httptest.ResponseRecorder, logs []string) {
@@ -50,7 +50,7 @@ func TestHandler(t *testing.T) {
 		},
 		{
 			name: "validation error",
-			setup: func(authSvc *mock.MockauthService, validator *mockvalidation.MockValidator, req *http.Request) {
+			setup: func(recSvc *mock.MockrecoveryService, validator *mockvalidation.MockValidator, req *http.Request) {
 				reqBody := `{"email": "dummy@example.com"}`
 				req.Body = io.NopCloser(strings.NewReader(reqBody))
 
@@ -69,7 +69,7 @@ func TestHandler(t *testing.T) {
 		},
 		{
 			name: "auth service error",
-			setup: func(authSvc *mock.MockauthService, validator *mockvalidation.MockValidator, req *http.Request) {
+			setup: func(recSvc *mock.MockrecoveryService, validator *mockvalidation.MockValidator, req *http.Request) {
 				reqBody := `{"email": "dummy@example.com"}`
 				req.Body = io.NopCloser(strings.NewReader(reqBody))
 
@@ -78,8 +78,8 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				authSvc.EXPECT().
-					CreateRecovery(gomock.Any(), gomock.Eq("dummy@example.com")).
+				recSvc.EXPECT().
+					Create(gomock.Any(), gomock.Eq("dummy@example.com")).
 					Return(errors.New("auth service dummy error"))
 			},
 			assert: func(t *testing.T, res *httptest.ResponseRecorder, logs []string) {
@@ -94,7 +94,7 @@ func TestHandler(t *testing.T) {
 		},
 		{
 			name: "ok",
-			setup: func(authSvc *mock.MockauthService, validator *mockvalidation.MockValidator, req *http.Request) {
+			setup: func(recSvc *mock.MockrecoveryService, validator *mockvalidation.MockValidator, req *http.Request) {
 				reqBody := `{"email": "dummy@example.com"}`
 				req.Body = io.NopCloser(strings.NewReader(reqBody))
 
@@ -103,8 +103,8 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				authSvc.EXPECT().
-					CreateRecovery(gomock.Any(), gomock.Eq("dummy@example.com")).
+				recSvc.EXPECT().
+					Create(gomock.Any(), gomock.Eq("dummy@example.com")).
 					Return(nil)
 			},
 			assert: func(t *testing.T, res *httptest.ResponseRecorder, logs []string) {
@@ -121,7 +121,7 @@ func TestHandler(t *testing.T) {
 
 			logbuf := &bytes.Buffer{}
 
-			authSvc := mock.NewMockauthService(ctrl)
+			recSvc := mock.NewMockrecoveryService(ctrl)
 			logger := zerolog.NewLoggerWithWriter(logbuf)
 			validator := mockvalidation.NewMockValidator(ctrl)
 
@@ -132,10 +132,10 @@ func TestHandler(t *testing.T) {
 			ctx.EXPECT().ResponseWriter().Return(res).AnyTimes()
 
 			if tt.setup != nil {
-				tt.setup(authSvc, validator, req)
+				tt.setup(recSvc, validator, req)
 			}
 
-			handler := NewHandler(authSvc, logger, validator)
+			handler := NewHandler(recSvc, logger, validator)
 			handler.Handle(ctx)
 
 			var logs []string

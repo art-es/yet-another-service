@@ -69,7 +69,7 @@ func TestCreateActivation(t *testing.T) {
 			user := &models.User{ID: "user id", Email: "iivan@example.com"}
 
 			service := NewService(*baseAcivationURL, m.activationRepository, nil, m.activationMailer)
-			err := service.CreateActivation(ctx, tx, user)
+			err := service.Create(ctx, tx, user)
 
 			tt.assert(t, err)
 		})

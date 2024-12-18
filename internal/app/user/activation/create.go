@@ -10,7 +10,7 @@ import (
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
-func (s *Service) CreateActivation(ctx context.Context, tx transaction.Transaction, user *models.User) error {
+func (s *Service) Create(ctx context.Context, tx transaction.Transaction, user *models.User) error {
 	activation := &models.UserActivation{
 		UserID: user.ID,
 	}

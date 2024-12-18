@@ -9,6 +9,7 @@ import (
 	"github.com/art-es/yet-another-service/internal/app/auth"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/http"
+	"github.com/art-es/yet-another-service/internal/core/http/util"
 	"github.com/art-es/yet-another-service/internal/core/log"
 	"github.com/art-es/yet-another-service/internal/core/validation"
 )
@@ -51,7 +52,7 @@ func NewHandler(
 func (h *Handler) Handle(ctx http.Context) {
 	req, err := h.parseRequest(ctx)
 	if err != nil {
-		http.RespondBadRequest(ctx, err.Error())
+		util.RespondBadRequest(ctx, err.Error())
 		return
 	}
 
@@ -62,23 +63,23 @@ func (h *Handler) Handle(ctx http.Context) {
 
 	switch {
 	case err == nil:
-		http.Respond(ctx, nethttp.StatusOK, response{
+		util.Respond(ctx, nethttp.StatusOK, response{
 			AccessToken:  out.AccessToken,
 			RefreshToken: out.RefreshToken,
 			TokenType:    tokenType,
 		})
 	case errors.Is(err, apperrors.ErrUserNotFound) || errors.Is(err, apperrors.ErrWrongPassword):
-		http.RespondBadRequest(ctx, "Wrong credentials.")
+		util.RespondBadRequest(ctx, "Wrong credentials.")
 	default:
 		h.logger.Error().Err(err).Msg("login error on auth service")
-		http.RespondInternalError(ctx)
+		util.RespondInternalError(ctx)
 	}
 }
 
 func (h *Handler) parseRequest(ctx http.Context) (*request, error) {
 	req := &request{}
 
-	if err := http.EnrichRequestBody(ctx, req); err != nil {
+	if err := util.EnrichRequestBody(ctx, req); err != nil {
 		return nil, err
 	}
 

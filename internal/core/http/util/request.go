@@ -1,14 +1,16 @@
-package http
+package util
 
 import (
 	"encoding/json"
 	"errors"
 	"strings"
+
+	"github.com/art-es/yet-another-service/internal/core/http"
 )
 
 var ErrInvalidRequestBody = errors.New("invalid request body")
 
-func EnrichRequestBody(ctx Context, out any) error {
+func EnrichRequestBody(ctx http.Context, out any) error {
 	req := ctx.Request()
 	if req == nil || req.Body == nil {
 		return ErrInvalidRequestBody
@@ -21,7 +23,7 @@ func EnrichRequestBody(ctx Context, out any) error {
 	return nil
 }
 
-func GetAuthorizationToken(ctx Context) (string, bool) {
+func GetAuthorizationToken(ctx http.Context) (string, bool) {
 	req := ctx.Request()
 	if req == nil || req.Header == nil {
 		return "", false

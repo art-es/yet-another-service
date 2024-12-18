@@ -117,7 +117,7 @@ func TestCreateRecovery(t *testing.T) {
 
 			baseRecoveryURL, _ := url.Parse("http://localhost/recover?some=foo")
 			service := NewService(*baseRecoveryURL, m.userRepository, m.recoveryRepository, m.recoveryMailer, nil)
-			err := service.CreateRecovery(context.Background(), "iivan@example.com")
+			err := service.Create(context.Background(), "iivan@example.com")
 
 			tt.assert(t, err, *m.state)
 		})

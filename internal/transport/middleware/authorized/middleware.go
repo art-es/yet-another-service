@@ -5,9 +5,10 @@ import (
 	"strings"
 
 	"github.com/art-es/yet-another-service/internal/app/shared/errors"
+	contextcore "github.com/art-es/yet-another-service/internal/core/context"
 	"github.com/art-es/yet-another-service/internal/core/http"
+	httputil "github.com/art-es/yet-another-service/internal/core/http/util"
 	"github.com/art-es/yet-another-service/internal/core/log"
-	contextutil "github.com/art-es/yet-another-service/internal/util/context"
 )
 
 const headerPrefix = "bearer "
@@ -25,7 +26,7 @@ func (m *Middleware) Wrap(handle http.Handler) http.Handler {
 	return func(ctx http.Context) {
 		authHeader := ctx.Request().Header.Get("Authorization")
 		if authHeader == "" || !strings.HasPrefix(strings.ToLower(authHeader), headerPrefix) {
-			http.RespondUnauthorized(ctx)
+			httputil.RespondUnauthorized(ctx)
 			return
 		}
 
@@ -34,15 +35,15 @@ func (m *Middleware) Wrap(handle http.Handler) http.Handler {
 		userID, err := m.authService.Authorize(ctx, accessToken)
 		if err != nil {
 			if err == errors.ErrInvalidAuthToken {
-				http.RespondUnauthorized(ctx)
+				httputil.RespondUnauthorized(ctx)
 			}
 
 			m.logger.Error().Err(err).Msg("authorize error")
-			http.RespondInternalError(ctx)
+			httputil.RespondInternalError(ctx)
 			return
 		}
 
-		ctx = ctx.With(contextutil.WithUserID(ctx, userID))
+		ctx = ctx.With(contextcore.WithUserID(ctx, userID))
 		handle(ctx)
 	}
 }

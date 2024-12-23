@@ -6,7 +6,7 @@ import (
 	"errors"
 	nethttp "net/http"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/http"
 	"github.com/art-es/yet-another-service/internal/core/http/util"
@@ -15,7 +15,7 @@ import (
 )
 
 type authService interface {
-	Logout(ctx context.Context, req *auth.LogoutIn) error
+	Logout(ctx context.Context, req *dto.LogoutIn) error
 }
 
 type request struct {
@@ -48,7 +48,7 @@ func (h *Handler) Handle(ctx http.Context) {
 		return
 	}
 
-	err = h.authService.Logout(ctx, &auth.LogoutIn{
+	err = h.authService.Logout(ctx, &dto.LogoutIn{
 		AccessToken:  req.AccessToken,
 		RefreshToken: req.RefreshToken,
 	})

@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
@@ -47,10 +47,10 @@ func (s *UserStorage) Exists(ctx context.Context, email string) (bool, error) {
 	return exists, nil
 }
 
-func (s *UserStorage) Find(ctx context.Context, id string) (*models.User, error) {
+func (s *UserStorage) Find(ctx context.Context, id string) (*dto.User, error) {
 	const query = "SELECT id, name, email, password_hash FROM users WHERE id=$1"
 
-	user := &models.User{}
+	user := &dto.User{}
 	err := s.db.QueryRowContext(ctx, query, id).
 		Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash)
 	if err != nil {
@@ -60,10 +60,10 @@ func (s *UserStorage) Find(ctx context.Context, id string) (*models.User, error)
 	return user, nil
 }
 
-func (s *UserStorage) FindByEmail(ctx context.Context, email string) (*models.User, error) {
+func (s *UserStorage) FindByEmail(ctx context.Context, email string) (*dto.User, error) {
 	const query = "SELECT id, name, email, password_hash FROM users WHERE email=$1"
 
-	user := &models.User{}
+	user := &dto.User{}
 	err := s.db.QueryRowContext(ctx, query, email).
 		Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash)
 	if err != nil {
@@ -73,7 +73,7 @@ func (s *UserStorage) FindByEmail(ctx context.Context, email string) (*models.Us
 	return user, nil
 }
 
-func (s *UserStorage) Save(ctx context.Context, tx transaction.Transaction, user *models.User) error {
+func (s *UserStorage) Save(ctx context.Context, tx transaction.Transaction, user *dto.User) error {
 	if !user.Stored() {
 		return s.store(ctx, tx, user)
 	}
@@ -81,7 +81,7 @@ func (s *UserStorage) Save(ctx context.Context, tx transaction.Transaction, user
 	return s.update(ctx, tx, user)
 }
 
-func (s *UserStorage) update(ctx context.Context, tx transaction.Transaction, user *models.User) error {
+func (s *UserStorage) update(ctx context.Context, tx transaction.Transaction, user *dto.User) error {
 	sqlTx, err := getSQLTxOrBegin(tx, s.db)
 	if err != nil {
 		return err
@@ -97,7 +97,7 @@ func (s *UserStorage) update(ctx context.Context, tx transaction.Transaction, us
 	return nil
 }
 
-func (s *UserStorage) store(ctx context.Context, tx transaction.Transaction, user *models.User) error {
+func (s *UserStorage) store(ctx context.Context, tx transaction.Transaction, user *dto.User) error {
 	sqlTx, err := getSQLTxOrBegin(tx, s.db)
 	if err != nil {
 		return err

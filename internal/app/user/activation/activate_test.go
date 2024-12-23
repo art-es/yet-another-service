@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
 	"github.com/art-es/yet-another-service/internal/app/user/activation/mock"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
@@ -51,7 +51,7 @@ func TestActivate(t *testing.T) {
 		{
 			name: "activate user in repository error",
 			setup: func(t *testing.T, m mocks) {
-				activation := &models.UserActivation{
+				activation := &dto.UserActivation{
 					Token:  "dummy token",
 					UserID: "dummy user id",
 				}
@@ -71,7 +71,7 @@ func TestActivate(t *testing.T) {
 		{
 			name: "delete activation by token in repository error",
 			setup: func(t *testing.T, m mocks) {
-				activation := &models.UserActivation{
+				activation := &dto.UserActivation{
 					Token:  "dummy token",
 					UserID: "dummy user id",
 				}
@@ -95,7 +95,7 @@ func TestActivate(t *testing.T) {
 		{
 			name: "commit transaction error",
 			setup: func(t *testing.T, m mocks) {
-				activation := &models.UserActivation{
+				activation := &dto.UserActivation{
 					Token:  "dummy token",
 					UserID: "dummy user id",
 				}
@@ -124,7 +124,7 @@ func TestActivate(t *testing.T) {
 		{
 			name: "ok",
 			setup: func(t *testing.T, m mocks) {
-				activation := &models.UserActivation{
+				activation := &dto.UserActivation{
 					Token:  "dummy token",
 					UserID: "dummy user id",
 				}

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/app/shared/errors"
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
@@ -33,7 +33,7 @@ func (s *Service) Activate(ctx context.Context, token string) error {
 	return nil
 }
 
-func (s *Service) doTransaction(ctx context.Context, tx transaction.Transaction, activation *models.UserActivation) error {
+func (s *Service) doTransaction(ctx context.Context, tx transaction.Transaction, activation *dto.UserActivation) error {
 	if err := s.userRepository.Activate(ctx, tx, activation.UserID); err != nil {
 		return fmt.Errorf("activate user in repository: %w", err)
 	}

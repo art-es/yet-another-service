@@ -13,8 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	dto "github.com/art-es/yet-another-service/internal/app/auth"
-
+	dto "github.com/art-es/yet-another-service/internal/app/shared/dto"
 	gomock "go.uber.org/mock/gomock"
 )
 

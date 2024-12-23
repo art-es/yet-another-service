@@ -11,7 +11,7 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/art-es/yet-another-service/internal/app/mailing/mock"
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	mockretrier "github.com/art-es/yet-another-service/internal/core/retrier/mock"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
 )
@@ -25,7 +25,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "ok",
 			setup: func(mailRepository *mock.MockmailRepository, mailer *mock.Mockmailer) {
-				gotMails := []models.Mail{
+				gotMails := []dto.Mail{
 					{ID: "mail id 1", Address: "foo@example.com", Subject: "mail 1", Content: "lorem ipsum 1"},
 					{ID: "mail id 2", Address: "bar@example.com", Subject: "mail 2", Content: "lorem ipsum 2"},
 				}
@@ -41,7 +41,7 @@ func TestRun(t *testing.T) {
 					MailTo(gomock.Eq("bar@example.com"), gomock.Eq("mail 2"), gomock.Eq("lorem ipsum 2")).
 					Return(nil)
 
-				expectedMails := []models.Mail{
+				expectedMails := []dto.Mail{
 					{Mailed: true, ID: "mail id 1", Address: "foo@example.com", Subject: "mail 1", Content: "lorem ipsum 1"},
 					{Mailed: true, ID: "mail id 2", Address: "bar@example.com", Subject: "mail 2", Content: "lorem ipsum 2"},
 				}
@@ -62,7 +62,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "partially mails error",
 			setup: func(mailRepository *mock.MockmailRepository, mailer *mock.Mockmailer) {
-				gotMails := []models.Mail{
+				gotMails := []dto.Mail{
 					{ID: "mail id 1", Address: "foo@example.com", Subject: "mail 1", Content: "lorem ipsum 1"},
 					{ID: "mail id 2", Address: "bar@example.com", Subject: "mail 2", Content: "lorem ipsum 2"},
 				}
@@ -78,7 +78,7 @@ func TestRun(t *testing.T) {
 					MailTo(gomock.Eq("bar@example.com"), gomock.Eq("mail 2"), gomock.Eq("lorem ipsum 2")).
 					Return(nil)
 
-				expectedMails := []models.Mail{
+				expectedMails := []dto.Mail{
 					{Mailed: false, ID: "mail id 1", Address: "foo@example.com", Subject: "mail 1", Content: "lorem ipsum 1"},
 					{Mailed: true, ID: "mail id 2", Address: "bar@example.com", Subject: "mail 2", Content: "lorem ipsum 2"},
 				}
@@ -100,7 +100,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "all mails error",
 			setup: func(mailRepository *mock.MockmailRepository, mailer *mock.Mockmailer) {
-				gotMails := []models.Mail{
+				gotMails := []dto.Mail{
 					{ID: "mail id 1", Address: "foo@example.com", Subject: "mail 1", Content: "lorem ipsum 1"},
 					{ID: "mail id 2", Address: "bar@example.com", Subject: "mail 2", Content: "lorem ipsum 2"},
 				}

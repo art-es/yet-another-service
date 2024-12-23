@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	auth "github.com/art-es/yet-another-service/internal/app/auth"
+	dto "github.com/art-es/yet-another-service/internal/app/shared/dto"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,10 +42,10 @@ func (m *MockauthService) EXPECT() *MockauthServiceMockRecorder {
 }
 
 // Login mocks base method.
-func (m *MockauthService) Login(ctx context.Context, req *auth.LoginIn) (*auth.LoginOut, error) {
+func (m *MockauthService) Login(ctx context.Context, req *dto.LoginIn) (*dto.LoginOut, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Login", ctx, req)
-	ret0, _ := ret[0].(*auth.LoginOut)
+	ret0, _ := ret[0].(*dto.LoginOut)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -5,9 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/app/shared/errors"
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
@@ -17,11 +16,11 @@ type hashGenerator interface {
 
 type userRepository interface {
 	Exists(ctx context.Context, email string) (bool, error)
-	Save(ctx context.Context, tx transaction.Transaction, user *models.User) error
+	Save(ctx context.Context, tx transaction.Transaction, user *dto.User) error
 }
 
 type activationService interface {
-	Create(ctx context.Context, tx transaction.Transaction, user *models.User) error
+	Create(ctx context.Context, tx transaction.Transaction, user *dto.User) error
 }
 
 type Service struct {
@@ -42,7 +41,7 @@ func NewService(
 	}
 }
 
-func (s *Service) Signup(ctx context.Context, in *auth.SignupIn) error {
+func (s *Service) Signup(ctx context.Context, in *dto.SignupIn) error {
 	userExists, err := s.userRepository.Exists(ctx, in.Email)
 	if err != nil {
 		return fmt.Errorf("check user exists in repository: %w", err)
@@ -66,13 +65,13 @@ func (s *Service) Signup(ctx context.Context, in *auth.SignupIn) error {
 	return nil
 }
 
-func (s *Service) doTransaction(ctx context.Context, tx transaction.Transaction, in *auth.SignupIn) error {
+func (s *Service) doTransaction(ctx context.Context, tx transaction.Transaction, in *dto.SignupIn) error {
 	passwordHash, err := s.hashGenerator.Generate(in.Password)
 	if err != nil {
 		return fmt.Errorf("generate password hash: %w", err)
 	}
 
-	user := &models.User{
+	user := &dto.User{
 		Name:         in.Name,
 		Email:        in.Email,
 		PasswordHash: passwordHash,

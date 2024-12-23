@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/app/shared/errors"
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
 	"github.com/art-es/yet-another-service/internal/core/mail"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
@@ -35,8 +35,8 @@ func (s *Service) Create(ctx context.Context, email string) error {
 	return nil
 }
 
-func (s *Service) doCreationTransaction(ctx context.Context, tx transaction.Transaction, user *models.User) error {
-	recovery := &models.PasswordRecovery{
+func (s *Service) doCreationTransaction(ctx context.Context, tx transaction.Transaction, user *dto.User) error {
+	recovery := &dto.PasswordRecovery{
 		UserID: user.ID,
 	}
 

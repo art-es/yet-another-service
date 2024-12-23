@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
@@ -19,10 +19,10 @@ func NewPasswordRecoveryStorage(db *sql.DB) *PasswordRecoveryStorage {
 	}
 }
 
-func (s *PasswordRecoveryStorage) Find(ctx context.Context, token string) (*models.PasswordRecovery, error) {
+func (s *PasswordRecoveryStorage) Find(ctx context.Context, token string) (*dto.PasswordRecovery, error) {
 	const query = "SELECT token, user_id FROM password_recoveries WHERE token=$1"
 
-	recovery := &models.PasswordRecovery{}
+	recovery := &dto.PasswordRecovery{}
 	err := s.db.QueryRowContext(ctx, query, token).
 		Scan(&recovery.Token, &recovery.UserID)
 	if err != nil {
@@ -47,7 +47,7 @@ func (s *PasswordRecoveryStorage) Delete(ctx context.Context, tx transaction.Tra
 	return nil
 }
 
-func (s *PasswordRecoveryStorage) Save(ctx context.Context, tx transaction.Transaction, recovery *models.PasswordRecovery) error {
+func (s *PasswordRecoveryStorage) Save(ctx context.Context, tx transaction.Transaction, recovery *dto.PasswordRecovery) error {
 	sqlTx, err := getSQLTxOrBegin(tx, s.db)
 	if err != nil {
 		return err

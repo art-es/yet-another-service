@@ -6,7 +6,7 @@ import (
 	"errors"
 	nethttp "net/http"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/http"
 	"github.com/art-es/yet-another-service/internal/core/http/util"
@@ -15,7 +15,7 @@ import (
 )
 
 type authService interface {
-	Signup(ctx context.Context, req *auth.SignupIn) error
+	Signup(ctx context.Context, req *dto.SignupIn) error
 }
 
 type request struct {
@@ -49,7 +49,7 @@ func (h *Handler) Handle(ctx http.Context) {
 		return
 	}
 
-	err = h.authService.Signup(ctx, &auth.SignupIn{
+	err = h.authService.Signup(ctx, &dto.SignupIn{
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,

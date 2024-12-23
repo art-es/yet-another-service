@@ -5,21 +5,21 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/core/mail"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
 type userRepository interface {
-	Find(ctx context.Context, id string) (*models.User, error)
-	FindByEmail(ctx context.Context, email string) (*models.User, error)
-	Save(ctx context.Context, tx transaction.Transaction, user *models.User) error
+	Find(ctx context.Context, id string) (*dto.User, error)
+	FindByEmail(ctx context.Context, email string) (*dto.User, error)
+	Save(ctx context.Context, tx transaction.Transaction, user *dto.User) error
 }
 
 type recoveryRepository interface {
-	Find(ctx context.Context, token string) (*models.PasswordRecovery, error)
+	Find(ctx context.Context, token string) (*dto.PasswordRecovery, error)
 	Delete(ctx context.Context, tx transaction.Transaction, token string) error
-	Save(ctx context.Context, tx transaction.Transaction, recovery *models.PasswordRecovery) error
+	Save(ctx context.Context, tx transaction.Transaction, recovery *dto.PasswordRecovery) error
 }
 
 type recoveryMailer interface {

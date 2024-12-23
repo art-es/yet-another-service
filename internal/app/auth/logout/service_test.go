@@ -7,26 +7,25 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/art-es/yet-another-service/internal/core/pointer"
-
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
 	"github.com/art-es/yet-another-service/internal/app/auth/logout/mock"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
+	"github.com/art-es/yet-another-service/internal/core/pointer"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
 )
 
 func TestLogout(t *testing.T) {
 	for _, tt := range []struct {
 		name   string
-		input  auth.LogoutIn
+		input  dto.LogoutIn
 		setup  func(tokenService *mock.MocktokenService)
 		assert func(t *testing.T, err error, logs []string)
 	}{
 		{
 			name: "invalidate refresh token error",
-			input: auth.LogoutIn{
+			input: dto.LogoutIn{
 				AccessToken:  pointer.To("access token"),
 				RefreshToken: "refresh token",
 			},
@@ -42,7 +41,7 @@ func TestLogout(t *testing.T) {
 		},
 		{
 			name: "ok, invalidate access token error",
-			input: auth.LogoutIn{
+			input: dto.LogoutIn{
 				AccessToken:  pointer.To("access token"),
 				RefreshToken: "refresh token",
 			},
@@ -63,7 +62,7 @@ func TestLogout(t *testing.T) {
 		},
 		{
 			name: "ok, no access token",
-			input: auth.LogoutIn{
+			input: dto.LogoutIn{
 				RefreshToken: "refresh token",
 			},
 			setup: func(tokenService *mock.MocktokenService) {
@@ -78,7 +77,7 @@ func TestLogout(t *testing.T) {
 		},
 		{
 			name: "ok",
-			input: auth.LogoutIn{
+			input: dto.LogoutIn{
 				AccessToken:  pointer.To("access token"),
 				RefreshToken: "refresh token",
 			},

@@ -6,7 +6,7 @@ import (
 	"errors"
 	nethttp "net/http"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/http"
 	"github.com/art-es/yet-another-service/internal/core/http/util"
@@ -17,7 +17,7 @@ import (
 const tokenType = "Bearer"
 
 type authService interface {
-	Login(ctx context.Context, req *auth.LoginIn) (*auth.LoginOut, error)
+	Login(ctx context.Context, req *dto.LoginIn) (*dto.LoginOut, error)
 }
 
 type request struct {
@@ -56,7 +56,7 @@ func (h *Handler) Handle(ctx http.Context) {
 		return
 	}
 
-	out, err := h.authService.Login(ctx, &auth.LoginIn{
+	out, err := h.authService.Login(ctx, &dto.LoginIn{
 		Email:    req.Email,
 		Password: req.Password,
 	})

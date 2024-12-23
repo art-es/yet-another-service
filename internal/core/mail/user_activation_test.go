@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/core/mail/mock"
 )
 
@@ -32,7 +32,7 @@ func TestUserActivationMailer(t *testing.T) {
 		{
 			name: "mail error",
 			setup: func(mailRepository *mock.MockmailRepository) {
-				expectedMails := []models.Mail{
+				expectedMails := []dto.Mail{
 					{
 						Address: address,
 						Subject: userActivationSubject,
@@ -51,7 +51,7 @@ func TestUserActivationMailer(t *testing.T) {
 		{
 			name: "ok",
 			setup: func(mailRepository *mock.MockmailRepository) {
-				expectedMails := []models.Mail{
+				expectedMails := []dto.Mail{
 					{
 						Address: address,
 						Subject: userActivationSubject,

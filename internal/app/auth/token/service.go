@@ -7,15 +7,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 )
 
 var getCurrentTime = time.Now
 
 type jwtService interface {
-	Parse(token string) (*auth.TokenClaims, error)
-	Generate(claims *auth.TokenClaims) (string, error)
+	Parse(s string) (*dto.AuthTokenClaims, error)
+	Generate(claims *dto.AuthTokenClaims) (string, error)
 }
 
 type blackList interface {
@@ -35,20 +35,20 @@ func NewService(jwtService jwtService, blackList blackList) *Service {
 	}
 }
 
-func (s *Service) Generate(userID string) (*auth.TokenPair, error) {
+func (s *Service) Generate(userID string) (*dto.AuthTokenPair, error) {
 	now := getCurrentTime()
 
-	accessToken, err := s.jwtService.Generate(auth.NewAccessTokenClaims(now, userID))
+	accessToken, err := s.jwtService.Generate(dto.NewAccessTokenClaims(now, userID))
 	if err != nil {
 		return nil, fmt.Errorf("generate access token: %w", err)
 	}
 
-	refreshToken, err := s.jwtService.Generate(auth.NewRefreshTokenClaims(now, userID))
+	refreshToken, err := s.jwtService.Generate(dto.NewRefreshTokenClaims(now, userID))
 	if err != nil {
 		return nil, fmt.Errorf("generate refresh token: %w", err)
 	}
 
-	return &auth.TokenPair{
+	return &dto.AuthTokenPair{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
@@ -69,7 +69,7 @@ func (s *Service) Refresh(ctx context.Context, refreshToken string) (string, err
 		return "", apperrors.ErrInvalidAuthToken
 	}
 
-	accessTokenClaims := claims.ToAccessToken(getCurrentTime())
+	accessTokenClaims := claims.ToAccessTokenClaims(getCurrentTime())
 
 	accessToken, err := s.jwtService.Generate(accessTokenClaims)
 	if err != nil {

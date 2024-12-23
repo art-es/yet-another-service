@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
+
 	"github.com/golang-jwt/jwt/v4"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/log"
 )
@@ -28,8 +29,8 @@ type internalClaims struct {
 	UserID string `json:"uid,omitempty"`
 }
 
-func (s *Service) Generate(claims *auth.TokenClaims) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &internalClaims{
+func (s *Service) Generate(claims *dto.AuthTokenClaims) (string, error) {
+	tokenObject := jwt.NewWithClaims(jwt.SigningMethodHS256, &internalClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(claims.IssuedAt),
 			ExpiresAt: jwt.NewNumericDate(claims.ExpiresAt),
@@ -37,7 +38,7 @@ func (s *Service) Generate(claims *auth.TokenClaims) (string, error) {
 		UserID: claims.UserID,
 	})
 
-	signedToken, err := token.SignedString(s.secret)
+	signedToken, err := tokenObject.SignedString(s.secret)
 	if err != nil {
 		return "", fmt.Errorf("signing token: %w", err)
 	}
@@ -45,8 +46,8 @@ func (s *Service) Generate(claims *auth.TokenClaims) (string, error) {
 	return signedToken, nil
 }
 
-func (s *Service) Parse(signedToken string) (*auth.TokenClaims, error) {
-	token, err := jwt.ParseWithClaims(signedToken, &internalClaims{}, func(token *jwt.Token) (any, error) {
+func (s *Service) Parse(signedToken string) (*dto.AuthTokenClaims, error) {
+	tokenObject, err := jwt.ParseWithClaims(signedToken, &internalClaims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			s.logger.Error().
 				Str("signing_method", fmt.Sprintf("%v", token.Header["alg"])).
@@ -61,12 +62,12 @@ func (s *Service) Parse(signedToken string) (*auth.TokenClaims, error) {
 		return nil, apperrors.ErrInvalidAuthToken
 	}
 
-	claims, ok := token.Claims.(*internalClaims)
-	if !ok || !token.Valid {
+	claims, ok := tokenObject.Claims.(*internalClaims)
+	if !ok || !tokenObject.Valid {
 		return nil, apperrors.ErrInvalidAuthToken
 	}
 
-	return &auth.TokenClaims{
+	return &dto.AuthTokenClaims{
 		IssuedAt:  claims.IssuedAt.Time,
 		ExpiresAt: claims.ExpiresAt.Time,
 		UserID:    claims.UserID,

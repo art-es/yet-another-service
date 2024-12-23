@@ -1,4 +1,4 @@
-package models
+package dto
 
 type UserActivation struct {
 	Token  string

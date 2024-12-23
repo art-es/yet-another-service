@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
@@ -19,10 +19,10 @@ func NewUserActivationStorage(db *sql.DB) *UserActivationStorage {
 	}
 }
 
-func (s *UserActivationStorage) Find(ctx context.Context, token string) (*models.UserActivation, error) {
+func (s *UserActivationStorage) Find(ctx context.Context, token string) (*dto.UserActivation, error) {
 	const query = "SELECT token, user_id FROM user_activations WHERE token=$1"
 
-	activation := &models.UserActivation{}
+	activation := &dto.UserActivation{}
 	err := s.db.QueryRowContext(ctx, query, token).
 		Scan(&activation.Token, &activation.UserID)
 	if err != nil {
@@ -47,7 +47,7 @@ func (s *UserActivationStorage) Delete(ctx context.Context, tx transaction.Trans
 	return nil
 }
 
-func (s *UserActivationStorage) Save(ctx context.Context, tx transaction.Transaction, activation *models.UserActivation) error {
+func (s *UserActivationStorage) Save(ctx context.Context, tx transaction.Transaction, activation *dto.UserActivation) error {
 	sqlTx, err := getSQLTxOrBegin(tx, s.db)
 	if err != nil {
 		return err

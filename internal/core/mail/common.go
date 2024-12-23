@@ -5,21 +5,21 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 )
 
 type mailRepository interface {
-	Save(ctx context.Context, mails []models.Mail) error
+	Save(ctx context.Context, mails []dto.Mail) error
 }
 
 func saveMail(repo mailRepository, ctx context.Context, address, subject, content string) error {
-	mail := models.Mail{
+	mail := dto.Mail{
 		Address: address,
 		Subject: subject,
 		Content: content,
 	}
 
-	if err := repo.Save(ctx, []models.Mail{mail}); err != nil {
+	if err := repo.Save(ctx, []dto.Mail{mail}); err != nil {
 		return fmt.Errorf("save mail: %w", err)
 	}
 

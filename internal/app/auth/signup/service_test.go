@@ -8,10 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
 	"github.com/art-es/yet-another-service/internal/app/auth/signup/mock"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
@@ -84,7 +83,7 @@ func TestService(t *testing.T) {
 					Generate(gomock.Eq(userPassword)).
 					Return(userPasswordHash, nil)
 
-				expectedUser := &models.User{
+				expectedUser := &dto.User{
 					Name:         userName,
 					Email:        userEmail,
 					PasswordHash: userPasswordHash,
@@ -109,7 +108,7 @@ func TestService(t *testing.T) {
 					Generate(gomock.Eq(userPassword)).
 					Return(userPasswordHash, nil)
 
-				expectedUser := &models.User{
+				expectedUser := &dto.User{
 					Name:         userName,
 					Email:        userEmail,
 					PasswordHash: userPasswordHash,
@@ -117,12 +116,12 @@ func TestService(t *testing.T) {
 
 				m.userRepository.EXPECT().
 					Save(gomock.Any(), gomock.Not(nil), gomock.Eq(expectedUser)).
-					Do(func(_ context.Context, tx transaction.Transaction, user *models.User) {
+					Do(func(_ context.Context, tx transaction.Transaction, user *dto.User) {
 						user.ID = userID
 					}).
 					Return(nil)
 
-				expectedUser = &models.User{
+				expectedUser = &dto.User{
 					ID:           userID,
 					Name:         userName,
 					Email:        userEmail,
@@ -148,7 +147,7 @@ func TestService(t *testing.T) {
 					Generate(gomock.Eq(userPassword)).
 					Return(userPasswordHash, nil)
 
-				expectedUser := &models.User{
+				expectedUser := &dto.User{
 					Name:         userName,
 					Email:        userEmail,
 					PasswordHash: userPasswordHash,
@@ -156,7 +155,7 @@ func TestService(t *testing.T) {
 
 				m.userRepository.EXPECT().
 					Save(gomock.Any(), gomock.Not(nil), gomock.Eq(expectedUser)).
-					Do(func(_ context.Context, tx transaction.Transaction, user *models.User) {
+					Do(func(_ context.Context, tx transaction.Transaction, user *dto.User) {
 						user.ID = userID
 
 						tx.AddCommit(func() error {
@@ -165,7 +164,7 @@ func TestService(t *testing.T) {
 					}).
 					Return(nil)
 
-				expectedUser = &models.User{
+				expectedUser = &dto.User{
 					ID:           userID,
 					Name:         userName,
 					Email:        userEmail,
@@ -191,7 +190,7 @@ func TestService(t *testing.T) {
 					Generate(gomock.Eq(userPassword)).
 					Return(userPasswordHash, nil)
 
-				expectedUser := &models.User{
+				expectedUser := &dto.User{
 					Name:         userName,
 					Email:        userEmail,
 					PasswordHash: userPasswordHash,
@@ -199,12 +198,12 @@ func TestService(t *testing.T) {
 
 				m.userRepository.EXPECT().
 					Save(gomock.Any(), gomock.Not(nil), gomock.Eq(expectedUser)).
-					Do(func(_ context.Context, tx transaction.Transaction, user *models.User) {
+					Do(func(_ context.Context, tx transaction.Transaction, user *dto.User) {
 						user.ID = userID
 					}).
 					Return(nil)
 
-				expectedUser = &models.User{
+				expectedUser = &dto.User{
 					ID:           userID,
 					Name:         userName,
 					Email:        userEmail,
@@ -239,7 +238,7 @@ func TestService(t *testing.T) {
 				m.userRepository,
 				m.activationService,
 			)
-			err := service.Signup(context.Background(), &auth.SignupIn{
+			err := service.Signup(context.Background(), &dto.SignupIn{
 				Name:     userName,
 				Email:    userEmail,
 				Password: userPassword,

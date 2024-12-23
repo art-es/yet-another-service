@@ -5,7 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
+
 	"github.com/art-es/yet-another-service/internal/core/log"
 )
 
@@ -28,7 +29,7 @@ func NewService(
 	}
 }
 
-func (s *Service) Logout(ctx context.Context, req *auth.LogoutIn) error {
+func (s *Service) Logout(ctx context.Context, req *dto.LogoutIn) error {
 	if err := s.tokenService.Invalidate(ctx, req.RefreshToken); err != nil {
 		return fmt.Errorf("invalidate refresh token: %w", err)
 	}

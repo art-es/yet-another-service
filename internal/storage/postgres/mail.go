@@ -8,7 +8,7 @@ import (
 
 	"github.com/lib/pq"
 
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 )
 
 type MailStorage struct {
@@ -21,7 +21,7 @@ func NewMailStorage(db *sql.DB) *MailStorage {
 	}
 }
 
-func (s *MailStorage) Get(ctx context.Context) ([]models.Mail, error) {
+func (s *MailStorage) Get(ctx context.Context) ([]dto.Mail, error) {
 	const query = "SELECT id, address, subject, content FROM mails LIMIT 20"
 
 	rows, err := s.db.QueryContext(ctx, query)
@@ -30,9 +30,9 @@ func (s *MailStorage) Get(ctx context.Context) ([]models.Mail, error) {
 	}
 	defer rows.Close()
 
-	var mails []models.Mail
+	var mails []dto.Mail
 	for rows.Next() {
-		var mail models.Mail
+		var mail dto.Mail
 
 		err = rows.Scan(&mail.ID, &mail.Address, &mail.Subject, &mail.Content)
 		if err != nil {
@@ -49,7 +49,7 @@ func (s *MailStorage) Get(ctx context.Context) ([]models.Mail, error) {
 	return mails, nil
 }
 
-func (s *MailStorage) Save(ctx context.Context, mails []models.Mail) error {
+func (s *MailStorage) Save(ctx context.Context, mails []dto.Mail) error {
 	if len(mails) == 0 {
 		return errors.New("nothing to save")
 	}
@@ -61,7 +61,7 @@ func (s *MailStorage) Save(ctx context.Context, mails []models.Mail) error {
 	return s.insert(ctx, mails)
 }
 
-func (s *MailStorage) insert(ctx context.Context, mails []models.Mail) error {
+func (s *MailStorage) insert(ctx context.Context, mails []dto.Mail) error {
 	query := "INSERT INTO mails (address, subject, content) VALUES "
 	args := make([]any, 0, len(mails)*3)
 	for _, mail := range mails {
@@ -80,7 +80,7 @@ func (s *MailStorage) insert(ctx context.Context, mails []models.Mail) error {
 	return nil
 }
 
-func (s *MailStorage) update(ctx context.Context, mails []models.Mail) error {
+func (s *MailStorage) update(ctx context.Context, mails []dto.Mail) error {
 	mailedIDs := make([]string, 0, len(mails))
 	for _, mail := range mails {
 		if mail.Mailed {

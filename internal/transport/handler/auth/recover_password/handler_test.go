@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	mockhttp "github.com/art-es/yet-another-service/internal/core/http/mock"
 	mockvalidation "github.com/art-es/yet-another-service/internal/core/validation/mock"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
@@ -95,7 +95,7 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expRecoverIn := &auth.PasswordRecoverIn{
+				expRecoverIn := &dto.PasswordRecoverIn{
 					Token:       "dummy token",
 					OldPassword: "old password",
 					NewPassword: "new password",
@@ -133,7 +133,7 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expRecoverIn := &auth.PasswordRecoverIn{
+				expRecoverIn := &dto.PasswordRecoverIn{
 					Token:       "dummy token",
 					OldPassword: "old password",
 					NewPassword: "new password",

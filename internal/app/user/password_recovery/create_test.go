@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
 	"github.com/art-es/yet-another-service/internal/app/user/password_recovery/mock"
 	"github.com/art-es/yet-another-service/internal/core/mail"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
@@ -134,9 +134,9 @@ func newCreateRecoveryMocks(ctrl *gomock.Controller) createRecoveryMocks {
 }
 
 func (m *createRecoveryMocks) expectFindUser(found bool, err error) {
-	var foundUser *models.User
+	var foundUser *dto.User
 	if found {
-		foundUser = &models.User{
+		foundUser = &dto.User{
 			ID:           "user id",
 			Name:         "Ivanov Ivan",
 			Email:        "iivan@example.com",
@@ -150,13 +150,13 @@ func (m *createRecoveryMocks) expectFindUser(found bool, err error) {
 }
 
 func (m *createRecoveryMocks) expectSaveRecovery(recoverySaveErr, txCommitErr error) {
-	expectedRecovery := &models.PasswordRecovery{
+	expectedRecovery := &dto.PasswordRecovery{
 		UserID: "user id",
 	}
 
 	m.recoveryRepository.EXPECT().
 		Save(gomock.Any(), gomock.Not(nil), gomock.Eq(expectedRecovery)).
-		Do(func(_ context.Context, tx transaction.Transaction, r *models.PasswordRecovery) {
+		Do(func(_ context.Context, tx transaction.Transaction, r *dto.PasswordRecovery) {
 			r.Token = "foo_token"
 
 			tx.AddRollback(func() {

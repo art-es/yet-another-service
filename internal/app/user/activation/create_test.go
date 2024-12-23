@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/app/user/activation/mock"
 	"github.com/art-es/yet-another-service/internal/core/mail"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
@@ -66,7 +66,7 @@ func TestCreateActivation(t *testing.T) {
 			baseAcivationURL, _ := url.Parse("http://localhost/activate?q=1")
 			ctx := context.Background()
 			tx := transaction.New(ctx)
-			user := &models.User{ID: "user id", Email: "iivan@example.com"}
+			user := &dto.User{ID: "user id", Email: "iivan@example.com"}
 
 			service := NewService(*baseAcivationURL, m.activationRepository, nil, m.activationMailer)
 			err := service.Create(ctx, tx, user)
@@ -84,13 +84,13 @@ func newCreateActivationMocks(ctrl *gomock.Controller) createActivationMocks {
 }
 
 func (m createActivationMocks) expectSaveActivation(err error) {
-	expectedActivation := &models.UserActivation{
+	expectedActivation := &dto.UserActivation{
 		UserID: "user id",
 	}
 
 	m.activationRepository.EXPECT().
 		Save(gomock.Any(), gomock.Any(), gomock.Eq(expectedActivation)).
-		Do(func(_ context.Context, _ transaction.Transaction, activation *models.UserActivation) {
+		Do(func(_ context.Context, _ transaction.Transaction, activation *dto.UserActivation) {
 			activation.Token = "foo_token"
 		}).
 		Return(err)

@@ -9,9 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
 	"github.com/art-es/yet-another-service/internal/app/user/password_recovery/mock"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
@@ -192,7 +191,7 @@ func TestRecover(t *testing.T) {
 			tt.setup(m)
 
 			service := NewService(url.URL{}, m.userRepository, m.recoveryRepository, nil, m.hashService)
-			err := service.Recover(context.Background(), &auth.PasswordRecoverIn{
+			err := service.Recover(context.Background(), &dto.PasswordRecoverIn{
 				Token:       "foo_token",
 				OldPassword: "old password",
 				NewPassword: "new password",
@@ -213,9 +212,9 @@ func newRecoverMocks(ctrl *gomock.Controller) recoverMocks {
 }
 
 func (m *recoverMocks) expectFindRecovery(found bool, err error) {
-	var foundRecovery *models.PasswordRecovery
+	var foundRecovery *dto.PasswordRecovery
 	if found {
-		foundRecovery = &models.PasswordRecovery{
+		foundRecovery = &dto.PasswordRecovery{
 			Token:  "foo_token",
 			UserID: "user id",
 		}
@@ -227,9 +226,9 @@ func (m *recoverMocks) expectFindRecovery(found bool, err error) {
 }
 
 func (m *recoverMocks) expectFindUser(found bool, err error) {
-	var foundUser *models.User
+	var foundUser *dto.User
 	if found {
-		foundUser = &models.User{
+		foundUser = &dto.User{
 			ID:           "user id",
 			Name:         "Ivanov Ivan",
 			Email:        "iivan@example.com",
@@ -260,7 +259,7 @@ func (m *recoverMocks) expectGenerateNewPasswordHash(err error) {
 }
 
 func (m *recoverMocks) expectSaveUser(userSaveErr, txCommitErr error) {
-	expectedUser := &models.User{
+	expectedUser := &dto.User{
 		ID:           "user id",
 		Name:         "Ivanov Ivan",
 		Email:        "iivan@example.com",
@@ -269,7 +268,7 @@ func (m *recoverMocks) expectSaveUser(userSaveErr, txCommitErr error) {
 
 	m.userRepository.EXPECT().
 		Save(gomock.Any(), gomock.Not(nil), gomock.Eq(expectedUser)).
-		Do(func(_ context.Context, tx transaction.Transaction, u *models.User) {
+		Do(func(_ context.Context, tx transaction.Transaction, u *dto.User) {
 			tx.AddRollback(func() {
 				m.state.txRollbacked = true
 			})

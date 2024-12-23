@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	mockhttp "github.com/art-es/yet-another-service/internal/core/http/mock"
 	mockvalidation "github.com/art-es/yet-another-service/internal/core/validation/mock"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
@@ -79,7 +79,7 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expAuthReq := &auth.SignupIn{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
+				expAuthReq := &dto.SignupIn{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
 				authSvc.EXPECT().
 					Signup(gomock.Any(), gomock.Eq(expAuthReq)).
 					Return(errors.New("auth service dummy error"))
@@ -105,7 +105,7 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expAuthReq := &auth.SignupIn{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
+				expAuthReq := &dto.SignupIn{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
 				authSvc.EXPECT().
 					Signup(gomock.Any(), gomock.Eq(expAuthReq)).
 					Return(nil)

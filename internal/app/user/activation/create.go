@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/core/mail"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
-func (s *Service) Create(ctx context.Context, tx transaction.Transaction, user *models.User) error {
-	activation := &models.UserActivation{
+func (s *Service) Create(ctx context.Context, tx transaction.Transaction, user *dto.User) error {
+	activation := &dto.UserActivation{
 		UserID: user.ID,
 	}
 

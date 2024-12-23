@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	models "github.com/art-es/yet-another-service/internal/app/shared/models"
+	models "github.com/art-es/yet-another-service/internal/app/shared/dto"
 	mail "github.com/art-es/yet-another-service/internal/core/mail"
 	transaction "github.com/art-es/yet-another-service/internal/core/transaction"
 	gomock "go.uber.org/mock/gomock"

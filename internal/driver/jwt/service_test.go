@@ -8,10 +8,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
+
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
 )
@@ -41,7 +42,7 @@ func TestService_Expired(t *testing.T) {
 		service.logger = zerolog.NewLoggerWithWriter(logbuf)
 		prevMonth := time.Now().Add(-month)
 
-		token, err := service.Generate(auth.NewAccessTokenClaims(prevMonth, "dummy user id"))
+		token, err := service.Generate(dto.NewAccessTokenClaims(prevMonth, "dummy user id"))
 		assert.NoError(t, err)
 		assert.NotEmpty(t, token)
 
@@ -57,7 +58,7 @@ func TestService_Expired(t *testing.T) {
 		logbuf := &bytes.Buffer{}
 		service.logger = zerolog.NewLoggerWithWriter(logbuf)
 
-		token, err := service.Generate(auth.NewAccessTokenClaims(time.Now(), "dummy user id"))
+		token, err := service.Generate(dto.NewAccessTokenClaims(time.Now(), "dummy user id"))
 		assert.NoError(t, err)
 		assert.NotEmpty(t, token)
 

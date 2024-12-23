@@ -14,7 +14,7 @@ import (
 	reflect "reflect"
 	time "time"
 
-	auth "github.com/art-es/yet-another-service/internal/app/auth"
+	dto "github.com/art-es/yet-another-service/internal/app/shared/dto"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -43,7 +43,7 @@ func (m *MockjwtService) EXPECT() *MockjwtServiceMockRecorder {
 }
 
 // Generate mocks base method.
-func (m *MockjwtService) Generate(claims *auth.TokenClaims) (string, error) {
+func (m *MockjwtService) Generate(claims *dto.AuthTokenClaims) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Generate", claims)
 	ret0, _ := ret[0].(string)
@@ -58,18 +58,18 @@ func (mr *MockjwtServiceMockRecorder) Generate(claims any) *gomock.Call {
 }
 
 // Parse mocks base method.
-func (m *MockjwtService) Parse(token string) (*auth.TokenClaims, error) {
+func (m *MockjwtService) Parse(s string) (*dto.AuthTokenClaims, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Parse", token)
-	ret0, _ := ret[0].(*auth.TokenClaims)
+	ret := m.ctrl.Call(m, "Parse", s)
+	ret0, _ := ret[0].(*dto.AuthTokenClaims)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Parse indicates an expected call of Parse.
-func (mr *MockjwtServiceMockRecorder) Parse(token any) *gomock.Call {
+func (mr *MockjwtServiceMockRecorder) Parse(s any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Parse", reflect.TypeOf((*MockjwtService)(nil).Parse), token)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Parse", reflect.TypeOf((*MockjwtService)(nil).Parse), s)
 }
 
 // MockblackList is a mock of blackList interface.

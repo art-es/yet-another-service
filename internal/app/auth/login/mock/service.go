@@ -13,8 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	auth "github.com/art-es/yet-another-service/internal/app/auth"
-	models "github.com/art-es/yet-another-service/internal/app/shared/models"
+	models "github.com/art-es/yet-another-service/internal/app/shared/dto"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -120,10 +119,10 @@ func (m *MocktokenGenerator) EXPECT() *MocktokenGeneratorMockRecorder {
 }
 
 // Generate mocks base method.
-func (m *MocktokenGenerator) Generate(userID string) (*auth.TokenPair, error) {
+func (m *MocktokenGenerator) Generate(userID string) (*models.AuthTokenPair, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Generate", userID)
-	ret0, _ := ret[0].(*auth.TokenPair)
+	ret0, _ := ret[0].(*models.AuthTokenPair)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

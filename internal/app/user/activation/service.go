@@ -5,15 +5,15 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/core/mail"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
 type activationRepository interface {
-	Find(ctx context.Context, token string) (*models.UserActivation, error)
+	Find(ctx context.Context, token string) (*dto.UserActivation, error)
 	Delete(ctx context.Context, tx transaction.Transaction, token string) error
-	Save(ctx context.Context, tx transaction.Transaction, activation *models.UserActivation) error
+	Save(ctx context.Context, tx transaction.Transaction, activation *dto.UserActivation) error
 }
 
 type userRepository interface {

@@ -1,4 +1,4 @@
-package models
+package dto
 
 type PasswordRecovery struct {
 	Token  string

@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/app/shared/errors"
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
 	"github.com/art-es/yet-another-service/internal/core/transaction"
 )
 
-func (s *Service) Recover(ctx context.Context, in *auth.PasswordRecoverIn) error {
+func (s *Service) Recover(ctx context.Context, in *dto.PasswordRecoverIn) error {
 	recovery, err := s.recoveryRepository.Find(ctx, in.Token)
 	if err != nil {
 		return fmt.Errorf("find recovery in repository: %w", err)
@@ -57,8 +56,8 @@ func (s *Service) Recover(ctx context.Context, in *auth.PasswordRecoverIn) error
 func (s *Service) doRecoverTransaction(
 	ctx context.Context,
 	tx transaction.Transaction,
-	user *models.User,
-	recovery *models.PasswordRecovery,
+	user *dto.User,
+	recovery *dto.PasswordRecovery,
 ) error {
 	if err := s.userRepository.Save(ctx, tx, user); err != nil {
 		return fmt.Errorf("save user in repository: %w", err)

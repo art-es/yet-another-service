@@ -6,7 +6,7 @@ import (
 	"errors"
 	nethttp "net/http"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 	"github.com/art-es/yet-another-service/internal/core/http"
 	"github.com/art-es/yet-another-service/internal/core/http/util"
@@ -15,7 +15,7 @@ import (
 )
 
 type authService interface {
-	Recover(ctx context.Context, in *auth.PasswordRecoverIn) error
+	Recover(ctx context.Context, in *dto.PasswordRecoverIn) error
 }
 
 type request struct {
@@ -49,7 +49,7 @@ func (h *Handler) Handle(ctx http.Context) {
 		return
 	}
 
-	err = h.authService.Recover(ctx, &auth.PasswordRecoverIn{
+	err = h.authService.Recover(ctx, &dto.PasswordRecoverIn{
 		Token:       req.Token,
 		OldPassword: req.OldPassword,
 		NewPassword: req.NewPassword,

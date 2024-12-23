@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/art-es/yet-another-service/internal/app/shared/models"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	"github.com/art-es/yet-another-service/internal/core/log"
 	"github.com/art-es/yet-another-service/internal/core/retrier"
 )
 
 type mailRepository interface {
-	Get(ctx context.Context) ([]models.Mail, error)
-	Save(ctx context.Context, mails []models.Mail) error
+	Get(ctx context.Context) ([]dto.Mail, error)
+	Save(ctx context.Context, mails []dto.Mail) error
 }
 
 type mailer interface {

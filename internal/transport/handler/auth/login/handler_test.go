@@ -10,10 +10,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
+
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
 	mockhttp "github.com/art-es/yet-another-service/internal/core/http/mock"
 	mockvalidation "github.com/art-es/yet-another-service/internal/core/validation/mock"
 	"github.com/art-es/yet-another-service/internal/driver/zerolog"
@@ -79,7 +80,7 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expAuthReq := &auth.LoginIn{Email: "dummy@example.com", Password: "dummy123"}
+				expAuthReq := &dto.LoginIn{Email: "dummy@example.com", Password: "dummy123"}
 				authSvc.EXPECT().
 					Login(gomock.Any(), gomock.Eq(expAuthReq)).
 					Return(nil, errors.New("auth service dummy error"))
@@ -105,8 +106,8 @@ func TestHandler(t *testing.T) {
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expAuthReq := &auth.LoginIn{Email: "dummy@example.com", Password: "dummy123"}
-				authRes := &auth.LoginOut{AccessToken: "dummy access token", RefreshToken: "dummy refresh token"}
+				expAuthReq := &dto.LoginIn{Email: "dummy@example.com", Password: "dummy123"}
+				authRes := &dto.LoginOut{AccessToken: "dummy access token", RefreshToken: "dummy refresh token"}
 				authSvc.EXPECT().
 					Login(gomock.Any(), gomock.Eq(expAuthReq)).
 					Return(authRes, nil)

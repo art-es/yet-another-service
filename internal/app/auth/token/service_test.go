@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/art-es/yet-another-service/internal/app/auth"
 	"github.com/art-es/yet-another-service/internal/app/auth/token/mock"
+	"github.com/art-es/yet-another-service/internal/app/shared/dto"
 	apperrors "github.com/art-es/yet-another-service/internal/app/shared/errors"
 )
 
@@ -30,12 +30,12 @@ func TestGenerate(t *testing.T) {
 	for _, tt := range []struct {
 		name   string
 		setup  func(t *testing.T, m mocks)
-		assert func(t *testing.T, res *auth.TokenPair, err error)
+		assert func(t *testing.T, res *dto.AuthTokenPair, err error)
 	}{
 		{
 			name: "generate access token error",
 			setup: func(t *testing.T, m mocks) {
-				expAccessTokenClaims := &auth.TokenClaims{
+				expAccessTokenClaims := &dto.AuthTokenClaims{
 					IssuedAt:  now,
 					ExpiresAt: nextHour,
 					UserID:    "dummy user id",
@@ -45,7 +45,7 @@ func TestGenerate(t *testing.T) {
 					Generate(gomock.Eq(expAccessTokenClaims)).
 					Return("", errors.New("dummy error"))
 			},
-			assert: func(t *testing.T, res *auth.TokenPair, err error) {
+			assert: func(t *testing.T, res *dto.AuthTokenPair, err error) {
 				assert.EqualError(t, err, "generate access token: dummy error")
 				assert.Nil(t, res)
 			},
@@ -53,7 +53,7 @@ func TestGenerate(t *testing.T) {
 		{
 			name: "generate refresh token error",
 			setup: func(t *testing.T, m mocks) {
-				expAccessTokenClaims := &auth.TokenClaims{
+				expAccessTokenClaims := &dto.AuthTokenClaims{
 					IssuedAt:  now,
 					ExpiresAt: nextHour,
 					UserID:    "dummy user id",
@@ -63,7 +63,7 @@ func TestGenerate(t *testing.T) {
 					Generate(gomock.Eq(expAccessTokenClaims)).
 					Return("dummy access token", nil)
 
-				expRefreshTokenClaims := &auth.TokenClaims{
+				expRefreshTokenClaims := &dto.AuthTokenClaims{
 					IssuedAt:  now,
 					ExpiresAt: nextWeek,
 					UserID:    "dummy user id",
@@ -73,7 +73,7 @@ func TestGenerate(t *testing.T) {
 					Generate(gomock.Eq(expRefreshTokenClaims)).
 					Return("", errors.New("dummy error"))
 			},
-			assert: func(t *testing.T, res *auth.TokenPair, err error) {
+			assert: func(t *testing.T, res *dto.AuthTokenPair, err error) {
 				assert.EqualError(t, err, "generate refresh token: dummy error")
 				assert.Nil(t, res)
 			},
@@ -81,7 +81,7 @@ func TestGenerate(t *testing.T) {
 		{
 			name: "ok",
 			setup: func(t *testing.T, m mocks) {
-				expAccessTokenClaims := &auth.TokenClaims{
+				expAccessTokenClaims := &dto.AuthTokenClaims{
 					IssuedAt:  now,
 					ExpiresAt: nextHour,
 					UserID:    "dummy user id",
@@ -91,7 +91,7 @@ func TestGenerate(t *testing.T) {
 					Generate(gomock.Eq(expAccessTokenClaims)).
 					Return("dummy access token", nil)
 
-				expRefreshTokenClaims := &auth.TokenClaims{
+				expRefreshTokenClaims := &dto.AuthTokenClaims{
 					IssuedAt:  now,
 					ExpiresAt: nextWeek,
 					UserID:    "dummy user id",
@@ -101,9 +101,9 @@ func TestGenerate(t *testing.T) {
 					Generate(gomock.Eq(expRefreshTokenClaims)).
 					Return("dummy refresh token", nil)
 			},
-			assert: func(t *testing.T, res *auth.TokenPair, err error) {
+			assert: func(t *testing.T, res *dto.AuthTokenPair, err error) {
 				assert.NoError(t, err)
-				expResult := &auth.TokenPair{
+				expResult := &dto.AuthTokenPair{
 					AccessToken:  "dummy access token",
 					RefreshToken: "dummy refresh token",
 				}
@@ -167,7 +167,7 @@ func TestRefresh(t *testing.T) {
 			setup: func(t *testing.T, m mocks) {
 				m.jwtService.EXPECT().
 					Parse(gomock.Eq("dummy refresh token")).
-					Return(&auth.TokenClaims{UserID: "dummy user id"}, nil)
+					Return(&dto.AuthTokenClaims{UserID: "dummy user id"}, nil)
 
 				m.blackList.EXPECT().
 					Has(gomock.Any(), gomock.Eq("dummy refresh token")).
@@ -182,7 +182,7 @@ func TestRefresh(t *testing.T) {
 			setup: func(t *testing.T, m mocks) {
 				m.jwtService.EXPECT().
 					Parse(gomock.Eq("dummy refresh token")).
-					Return(&auth.TokenClaims{UserID: "dummy user id"}, nil)
+					Return(&dto.AuthTokenClaims{UserID: "dummy user id"}, nil)
 
 				m.blackList.EXPECT().
 					Has(gomock.Any(), gomock.Eq("dummy refresh token")).
@@ -197,14 +197,14 @@ func TestRefresh(t *testing.T) {
 			setup: func(t *testing.T, m mocks) {
 				m.jwtService.EXPECT().
 					Parse(gomock.Eq("dummy refresh token")).
-					Return(&auth.TokenClaims{UserID: "dummy user id"}, nil)
+					Return(&dto.AuthTokenClaims{UserID: "dummy user id"}, nil)
 
 				m.blackList.EXPECT().
 					Has(gomock.Any(), gomock.Eq("dummy refresh token")).
 					Return(false, nil)
 
 				m.jwtService.EXPECT().
-					Generate(gomock.Eq(&auth.TokenClaims{
+					Generate(gomock.Eq(&dto.AuthTokenClaims{
 						IssuedAt:  now,
 						ExpiresAt: nextHour,
 						UserID:    "dummy user id",
@@ -220,14 +220,14 @@ func TestRefresh(t *testing.T) {
 			setup: func(t *testing.T, m mocks) {
 				m.jwtService.EXPECT().
 					Parse(gomock.Eq("dummy refresh token")).
-					Return(&auth.TokenClaims{UserID: "dummy user id"}, nil)
+					Return(&dto.AuthTokenClaims{UserID: "dummy user id"}, nil)
 
 				m.blackList.EXPECT().
 					Has(gomock.Any(), gomock.Eq("dummy refresh token")).
 					Return(false, nil)
 
 				m.jwtService.EXPECT().
-					Generate(gomock.Eq(&auth.TokenClaims{
+					Generate(gomock.Eq(&dto.AuthTokenClaims{
 						IssuedAt:  now,
 						ExpiresAt: nextHour,
 						UserID:    "dummy user id",
@@ -291,7 +291,7 @@ func TestAuthorize(t *testing.T) {
 			setup: func(m mocks) {
 				m.jwtService.EXPECT().
 					Parse(gomock.Eq("dummy access token")).
-					Return(&auth.TokenClaims{UserID: "dummy user id"}, nil)
+					Return(&dto.AuthTokenClaims{UserID: "dummy user id"}, nil)
 
 				m.blackList.EXPECT().
 					Has(gomock.Any(), gomock.Eq("dummy access token")).
@@ -307,7 +307,7 @@ func TestAuthorize(t *testing.T) {
 			setup: func(m mocks) {
 				m.jwtService.EXPECT().
 					Parse(gomock.Eq("dummy access token")).
-					Return(&auth.TokenClaims{UserID: "dummy user id"}, nil)
+					Return(&dto.AuthTokenClaims{UserID: "dummy user id"}, nil)
 
 				m.blackList.EXPECT().
 					Has(gomock.Any(), gomock.Eq("dummy access token")).
@@ -323,7 +323,7 @@ func TestAuthorize(t *testing.T) {
 			setup: func(m mocks) {
 				m.jwtService.EXPECT().
 					Parse(gomock.Eq("dummy access token")).
-					Return(&auth.TokenClaims{UserID: "dummy user id"}, nil)
+					Return(&dto.AuthTokenClaims{UserID: "dummy user id"}, nil)
 
 				m.blackList.EXPECT().
 					Has(gomock.Any(), gomock.Eq("dummy access token")).
@@ -389,7 +389,7 @@ func TestInvalidate(t *testing.T) {
 			setup: func(m mocks) {
 				m.jwtService.EXPECT().
 					Parse(gomock.Eq("dummy token")).
-					Return(&auth.TokenClaims{ExpiresAt: nextHour}, nil)
+					Return(&dto.AuthTokenClaims{ExpiresAt: nextHour}, nil)
 			},
 			assert: func(t *testing.T, err error) {
 				assert.EqualError(t, err, "black list TTL is negative")
@@ -400,7 +400,7 @@ func TestInvalidate(t *testing.T) {
 			setup: func(m mocks) {
 				m.jwtService.EXPECT().
 					Parse(gomock.Eq("dummy token")).
-					Return(&auth.TokenClaims{ExpiresAt: prevHour}, nil)
+					Return(&dto.AuthTokenClaims{ExpiresAt: prevHour}, nil)
 
 				m.blackList.EXPECT().
 					Add(gomock.Any(), gomock.Eq("dummy token"), gomock.Eq(time.Hour)).

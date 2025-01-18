@@ -1,3 +1,4 @@
+//go:generate mockgen -source=middleware.go -destination=mock/middleware.go -package=mock
 package authorized
 
 import (
@@ -22,6 +23,16 @@ type Middleware struct {
 	logger      log.Logger
 }
 
+func NewMiddleware(
+	authService authService,
+	logger log.Logger,
+) *Middleware {
+	return &Middleware{
+		authService: authService,
+		logger:      logger,
+	}
+}
+
 func (m *Middleware) Wrap(handle http.Handler) http.Handler {
 	return func(ctx http.Context) {
 		authHeader := ctx.Request().Header.Get("Authorization")
@@ -36,6 +47,7 @@ func (m *Middleware) Wrap(handle http.Handler) http.Handler {
 		if err != nil {
 			if err == errors.ErrInvalidAuthToken {
 				httputil.RespondUnauthorized(ctx)
+				return
 			}
 
 			m.logger.Error().Err(err).Msg("authorize error")

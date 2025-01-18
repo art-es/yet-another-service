@@ -1,0 +1,19 @@
+{
+  "articles": [
+    {
+      "slug": "bar",
+      "title": "Bar Title",
+      "content": "Bar Content",
+      "author": {
+        "nickName": "bob123",
+        "displayName": "Bob"
+      }
+    },
+    {
+      "slug": "baz",
+      "title": "Baz Title",
+      "content": "Baz Content"
+    }
+  ],
+  "hasMore": true
+}

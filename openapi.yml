@@ -2,9 +2,13 @@ openapi: 3.0.3
 info:
   title: Yet Another Service API
   version: 1.0.0
+tags:
+  - name: Auth
+  - name: Blog
 paths:
   /auth/signup:
     post:
+      tags: [Auth]
       summary: Allows users to register a new account.
       requestBody:
         required: true
@@ -35,6 +39,7 @@ paths:
                 type: object
   /auth/activate:
     get:
+      tags: [Auth]
       summary: Activates a user account by verifying a token provided in the email link.
       parameters:
         - name: token
@@ -49,6 +54,7 @@ paths:
           description: OK
   /auth/login:
     post:
+      tags: [Auth]
       summary: Authenticates users and generates an access token.
       requestBody:
         required: true
@@ -89,6 +95,7 @@ paths:
                     example: Bearer
   /auth/logout:
     post:
+      tags: [Auth]
       summary: Logs users out by invalidating their access and refresh tokens.
       parameters:
         - name: Authorization
@@ -120,6 +127,7 @@ paths:
                 type: object
   /auth/refresh:
     post:
+      tags: [Auth]
       summary: Refreshes the access token using a valid refresh token.
       parameters:
         - name: Authorization
@@ -141,6 +149,7 @@ paths:
                     type: string
   /auth/forgot-password:
     post:
+      tags: [Auth]
       summary: Initiates the password recovery process by sending a reset link or code.
       requestBody:
         required: true
@@ -161,6 +170,7 @@ paths:
                 type: object
   /auth/recover-password:
     post:
+      tags: [Auth]
       summary: Recovers the user's password using a token.
       requestBody:
         required: true
@@ -186,3 +196,39 @@ paths:
             application/json:
               schema:
                 type: object
+  /blog/articles:
+    get:
+      tags: [Blog]
+      summary: Get articles
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hasMore:
+                    type: boolean
+                  articles:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        slug:
+                          type: string
+                          example: example-article
+                        title:
+                          type: string
+                          example: Example article.
+                        content:
+                          type: string
+                        author:
+                          type: object
+                          properties:
+                            displayName: 
+                              type: string
+                              example: James Bond
+                            nickName:
+                              type: string
+                              example: james_bond007

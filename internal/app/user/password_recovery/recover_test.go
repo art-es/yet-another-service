@@ -230,7 +230,7 @@ func (m *recoverMocks) expectFindUser(found bool, err error) {
 	if found {
 		foundUser = &dto.User{
 			ID:           "user id",
-			Name:         "Ivanov Ivan",
+			DisplayName:  "Ivanov Ivan",
 			Email:        "iivan@example.com",
 			PasswordHash: "old password hash",
 		}
@@ -261,7 +261,7 @@ func (m *recoverMocks) expectGenerateNewPasswordHash(err error) {
 func (m *recoverMocks) expectSaveUser(userSaveErr, txCommitErr error) {
 	expectedUser := &dto.User{
 		ID:           "user id",
-		Name:         "Ivanov Ivan",
+		DisplayName:  "Ivanov Ivan",
 		Email:        "iivan@example.com",
 		PasswordHash: "new password hash",
 	}

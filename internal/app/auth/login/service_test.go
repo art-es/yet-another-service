@@ -54,7 +54,7 @@ func TestService(t *testing.T) {
 			setup: func(t *testing.T, m mocks) {
 				user := &dto.User{
 					ID:           "dummy user id",
-					Name:         "Ivanov Ivan",
+					DisplayName:  "Ivanov Ivan",
 					Email:        "iivan@example.com",
 					PasswordHash: "dummy password hash",
 				}
@@ -77,7 +77,7 @@ func TestService(t *testing.T) {
 			setup: func(t *testing.T, m mocks) {
 				user := &dto.User{
 					ID:           "dummy user id",
-					Name:         "Ivanov Ivan",
+					DisplayName:  "Ivanov Ivan",
 					Email:        "iivan@example.com",
 					PasswordHash: "dummy password hash",
 				}
@@ -100,7 +100,7 @@ func TestService(t *testing.T) {
 			setup: func(t *testing.T, m mocks) {
 				user := &dto.User{
 					ID:           "dummy user id",
-					Name:         "Ivanov Ivan",
+					DisplayName:  "Ivanov Ivan",
 					Email:        "iivan@example.com",
 					PasswordHash: "dummy password hash",
 				}
@@ -127,7 +127,7 @@ func TestService(t *testing.T) {
 			setup: func(t *testing.T, m mocks) {
 				user := &dto.User{
 					ID:           "dummy user id",
-					Name:         "Ivanov Ivan",
+					DisplayName:  "Ivanov Ivan",
 					Email:        "iivan@example.com",
 					PasswordHash: "dummy password hash",
 				}

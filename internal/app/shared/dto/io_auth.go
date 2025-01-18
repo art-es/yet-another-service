@@ -1,9 +1,10 @@
 package dto
 
 type SignupIn struct {
-	Name     string
-	Email    string
-	Password string
+	DisplayName string
+	NickName    string
+	Email       string
+	Password    string
 }
 
 type LoginIn struct {

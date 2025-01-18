@@ -72,7 +72,8 @@ func (s *Service) doTransaction(ctx context.Context, tx transaction.Transaction,
 	}
 
 	user := &dto.User{
-		Name:         in.Name,
+		DisplayName:  in.DisplayName,
+		NickName:     in.NickName,
 		Email:        in.Email,
 		PasswordHash: passwordHash,
 	}

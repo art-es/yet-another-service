@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"slices"
+	"time"
 
 	"github.com/art-es/yet-another-service/internal/core/log"
 )
@@ -20,12 +21,14 @@ var availableAppEnv = []string{
 }
 
 type appConfig struct {
-	appEnv                  string
-	postgresURL             string
-	redisAddr               string
-	jwtSecret               string
-	userActivationURL       url.URL
-	userPasswordRecoveryURL url.URL
+	appEnv                    string
+	postgresURL               string
+	redisAddr                 string
+	jwtSecret                 string
+	userActivationURL         url.URL
+	userPasswordRecoveryURL   url.URL
+	articleCacheTimeout       time.Duration
+	articleEnrichCacheTimeout time.Duration
 
 	logger log.Logger
 }

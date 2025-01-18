@@ -52,7 +52,7 @@ func (s *UserStorage) Find(ctx context.Context, id string) (*dto.User, error) {
 
 	user := &dto.User{}
 	err := s.db.QueryRowContext(ctx, query, id).
-		Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash)
+		Scan(&user.ID, &user.DisplayName, &user.Email, &user.PasswordHash)
 	if err != nil {
 		return nil, fmt.Errorf("execute query: %w", err)
 	}
@@ -65,7 +65,7 @@ func (s *UserStorage) FindByEmail(ctx context.Context, email string) (*dto.User,
 
 	user := &dto.User{}
 	err := s.db.QueryRowContext(ctx, query, email).
-		Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash)
+		Scan(&user.ID, &user.DisplayName, &user.Email, &user.PasswordHash)
 	if err != nil {
 		return nil, fmt.Errorf("execute query: %w", err)
 	}

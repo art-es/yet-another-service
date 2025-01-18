@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 
+	"github.com/art-es/yet-another-service/internal/app/blog/article"
+
 	"github.com/art-es/yet-another-service/internal/app/auth/login"
 	"github.com/art-es/yet-another-service/internal/app/auth/logout"
 	"github.com/art-es/yet-another-service/internal/app/auth/signup"
@@ -26,6 +28,7 @@ import (
 	recoverpasswordtp "github.com/art-es/yet-another-service/internal/transport/handler/auth/recover_password"
 	refreshtokentp "github.com/art-es/yet-another-service/internal/transport/handler/auth/refresh"
 	signuptp "github.com/art-es/yet-another-service/internal/transport/handler/auth/signup"
+	articlesgettp "github.com/art-es/yet-another-service/internal/transport/handler/blog/articles_get"
 )
 
 func main() {
@@ -45,6 +48,9 @@ func main() {
 	passwordRecoveryStorage := pqstorage.NewPasswordRecoveryStorage(pqDB)
 	mailStorage := pqstorage.NewMailStorage(pqDB)
 	authTokenBlackListStorage := rdstorage.NewAuthTokenBlackListStorage(rdDB)
+	articleStorage := pqstorage.NewArticleStorage(pqDB)
+	articleAuthorStorage := pqstorage.NewArticleAuthorStorage(pqDB)
+	articleCache := rdstorage.NewArticleCache(rdDB, logger, config.articleCacheTimeout, config.articleEnrichCacheTimeout)
 
 	// Mailers
 	userActivationMailer := mail.NewUserActivationMailer(mailStorage)
@@ -57,6 +63,7 @@ func main() {
 	signupService := signup.NewService(hashService, userStorage, userActivationService)
 	loginService := login.NewService(userStorage, hashService, authTokenService)
 	logoutService := logout.NewService(authTokenService, logger)
+	articleService := article.NewService(articleStorage, articleCache, articleAuthorStorage, logger)
 
 	// Transport Layer
 	signupHandler := signuptp.NewHandler(signupService, logger, validator)
@@ -66,6 +73,7 @@ func main() {
 	refreshHandler := refreshtokentp.NewHandler(authTokenService, logger)
 	forgotPasswordHandler := forgotpasswordtp.NewHandler(passwordRecoveryService, logger, validator)
 	recoverPasswordHandler := recoverpasswordtp.NewHandler(passwordRecoveryService, logger, validator)
+	articlesGetHandler := articlesgettp.NewHandler(articleService, logger)
 
 	router := gin.NewRouter()
 	router.Register(http.MethodPost, "/auth/signup", signupHandler.Handle)
@@ -75,6 +83,7 @@ func main() {
 	router.Register(http.MethodPost, "/auth/refresh", refreshHandler.Handle)
 	router.Register(http.MethodPost, "/auth/forgot-password", forgotPasswordHandler.Handle)
 	router.Register(http.MethodPost, "/auth/recover-password", recoverPasswordHandler.Handle)
+	router.Register(http.MethodGet, "/articles", articlesGetHandler.Handle)
 
 	if err := router.Run(); err != nil {
 		logger.Panic().Err(err).Msg("router run error")

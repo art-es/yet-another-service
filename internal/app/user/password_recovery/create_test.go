@@ -138,7 +138,7 @@ func (m *createRecoveryMocks) expectFindUser(found bool, err error) {
 	if found {
 		foundUser = &dto.User{
 			ID:           "user id",
-			Name:         "Ivanov Ivan",
+			DisplayName:  "Ivanov Ivan",
 			Email:        "iivan@example.com",
 			PasswordHash: "password hash",
 		}

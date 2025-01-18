@@ -55,7 +55,7 @@ func TestHandler(t *testing.T) {
 				reqBody := `{"name": "dummyName", "email": "dummy@example.com", "password": "dummy123"}`
 				req.Body = io.NopCloser(strings.NewReader(reqBody))
 
-				expParsedReq := &request{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
+				expParsedReq := &request{DisplayName: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
 				validator.EXPECT().
 					Struct(gomock.Eq(expParsedReq)).
 					Return(errors.New("dummy validation error"))
@@ -74,12 +74,12 @@ func TestHandler(t *testing.T) {
 				reqBody := `{"name": "dummyName", "email": "dummy@example.com", "password": "dummy123"}`
 				req.Body = io.NopCloser(strings.NewReader(reqBody))
 
-				expParsedReq := &request{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
+				expParsedReq := &request{DisplayName: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
 				validator.EXPECT().
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expAuthReq := &dto.SignupIn{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
+				expAuthReq := &dto.SignupIn{DisplayName: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
 				authSvc.EXPECT().
 					Signup(gomock.Any(), gomock.Eq(expAuthReq)).
 					Return(errors.New("auth service dummy error"))
@@ -100,12 +100,12 @@ func TestHandler(t *testing.T) {
 				reqBody := `{"name": "dummyName", "email": "dummy@example.com", "password": "dummy123"}`
 				req.Body = io.NopCloser(strings.NewReader(reqBody))
 
-				expParsedReq := &request{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
+				expParsedReq := &request{DisplayName: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
 				validator.EXPECT().
 					Struct(gomock.Eq(expParsedReq)).
 					Return(nil)
 
-				expAuthReq := &dto.SignupIn{Name: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
+				expAuthReq := &dto.SignupIn{DisplayName: "dummyName", Email: "dummy@example.com", Password: "dummy123"}
 				authSvc.EXPECT().
 					Signup(gomock.Any(), gomock.Eq(expAuthReq)).
 					Return(nil)

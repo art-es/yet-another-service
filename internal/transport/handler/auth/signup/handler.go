@@ -19,9 +19,10 @@ type authService interface {
 }
 
 type request struct {
-	Name     string `json:"name" validate:"required,lte=255"`
-	Email    string `json:"email" validate:"required,email,lte=255"`
-	Password string `json:"password" validate:"required,lte=32"`
+	DisplayName string `json:"displayName" validate:"required,lte=255"`
+	NickName    string `json:"nickName"  validate:"required,lte=255"`
+	Email       string `json:"email" validate:"required,email,lte=255"`
+	Password    string `json:"password" validate:"required,lte=32"`
 }
 
 type Handler struct {
@@ -50,9 +51,10 @@ func (h *Handler) Handle(ctx http.Context) {
 	}
 
 	err = h.authService.Signup(ctx, &dto.SignupIn{
-		Name:     req.Name,
-		Email:    req.Email,
-		Password: req.Password,
+		DisplayName: req.DisplayName,
+		NickName:    req.NickName,
+		Email:       req.Email,
+		Password:    req.Password,
 	})
 
 	switch {

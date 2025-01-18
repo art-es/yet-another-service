@@ -84,7 +84,7 @@ func TestService(t *testing.T) {
 					Return(userPasswordHash, nil)
 
 				expectedUser := &dto.User{
-					Name:         userName,
+					DisplayName:  userName,
 					Email:        userEmail,
 					PasswordHash: userPasswordHash,
 				}
@@ -109,7 +109,7 @@ func TestService(t *testing.T) {
 					Return(userPasswordHash, nil)
 
 				expectedUser := &dto.User{
-					Name:         userName,
+					DisplayName:  userName,
 					Email:        userEmail,
 					PasswordHash: userPasswordHash,
 				}
@@ -123,7 +123,7 @@ func TestService(t *testing.T) {
 
 				expectedUser = &dto.User{
 					ID:           userID,
-					Name:         userName,
+					DisplayName:  userName,
 					Email:        userEmail,
 					PasswordHash: userPasswordHash,
 				}
@@ -148,7 +148,7 @@ func TestService(t *testing.T) {
 					Return(userPasswordHash, nil)
 
 				expectedUser := &dto.User{
-					Name:         userName,
+					DisplayName:  userName,
 					Email:        userEmail,
 					PasswordHash: userPasswordHash,
 				}
@@ -166,7 +166,7 @@ func TestService(t *testing.T) {
 
 				expectedUser = &dto.User{
 					ID:           userID,
-					Name:         userName,
+					DisplayName:  userName,
 					Email:        userEmail,
 					PasswordHash: userPasswordHash,
 				}
@@ -191,7 +191,7 @@ func TestService(t *testing.T) {
 					Return(userPasswordHash, nil)
 
 				expectedUser := &dto.User{
-					Name:         userName,
+					DisplayName:  userName,
 					Email:        userEmail,
 					PasswordHash: userPasswordHash,
 				}
@@ -205,7 +205,7 @@ func TestService(t *testing.T) {
 
 				expectedUser = &dto.User{
 					ID:           userID,
-					Name:         userName,
+					DisplayName:  userName,
 					Email:        userEmail,
 					PasswordHash: userPasswordHash,
 				}
@@ -239,9 +239,9 @@ func TestService(t *testing.T) {
 				m.activationService,
 			)
 			err := service.Signup(context.Background(), &dto.SignupIn{
-				Name:     userName,
-				Email:    userEmail,
-				Password: userPassword,
+				DisplayName: userName,
+				Email:       userEmail,
+				Password:    userPassword,
 			})
 
 			if tt.assert != nil {

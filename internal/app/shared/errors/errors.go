@@ -20,3 +20,8 @@ var (
 var (
 	ErrHashMismatched = errors.New("mismatched hash and string")
 )
+
+// Cache specific
+var (
+	ErrNoCache = errors.New("no cache")
+)

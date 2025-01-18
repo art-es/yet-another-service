@@ -17,41 +17,41 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockblogService is a mock of blogService interface.
-type MockblogService struct {
+// MockarticleService is a mock of articleService interface.
+type MockarticleService struct {
 	ctrl     *gomock.Controller
-	recorder *MockblogServiceMockRecorder
+	recorder *MockarticleServiceMockRecorder
 	isgomock struct{}
 }
 
-// MockblogServiceMockRecorder is the mock recorder for MockblogService.
-type MockblogServiceMockRecorder struct {
-	mock *MockblogService
+// MockarticleServiceMockRecorder is the mock recorder for MockarticleService.
+type MockarticleServiceMockRecorder struct {
+	mock *MockarticleService
 }
 
-// NewMockblogService creates a new mock instance.
-func NewMockblogService(ctrl *gomock.Controller) *MockblogService {
-	mock := &MockblogService{ctrl: ctrl}
-	mock.recorder = &MockblogServiceMockRecorder{mock}
+// NewMockarticleService creates a new mock instance.
+func NewMockarticleService(ctrl *gomock.Controller) *MockarticleService {
+	mock := &MockarticleService{ctrl: ctrl}
+	mock.recorder = &MockarticleServiceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockblogService) EXPECT() *MockblogServiceMockRecorder {
+func (m *MockarticleService) EXPECT() *MockarticleServiceMockRecorder {
 	return m.recorder
 }
 
-// GetArticles mocks base method.
-func (m *MockblogService) GetArticles(ctx context.Context, in *dto.GetArticlesIn) (*dto.GetArticlesOut, error) {
+// Get mocks base method.
+func (m *MockarticleService) Get(ctx context.Context, in *dto.GetArticlesIn) (*dto.GetArticlesOut, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetArticles", ctx, in)
+	ret := m.ctrl.Call(m, "Get", ctx, in)
 	ret0, _ := ret[0].(*dto.GetArticlesOut)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetArticles indicates an expected call of GetArticles.
-func (mr *MockblogServiceMockRecorder) GetArticles(ctx, in any) *gomock.Call {
+// Get indicates an expected call of Get.
+func (mr *MockarticleServiceMockRecorder) Get(ctx, in any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetArticles", reflect.TypeOf((*MockblogService)(nil).GetArticles), ctx, in)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockarticleService)(nil).Get), ctx, in)
 }

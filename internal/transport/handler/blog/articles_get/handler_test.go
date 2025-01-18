@@ -28,14 +28,14 @@ var (
 func TestHandler(t *testing.T) {
 	for _, tt := range []struct {
 		name   string
-		setup  func(req *http.Request, blog *mock.MockblogService)
+		setup  func(req *http.Request, articleSvc *mock.MockarticleService)
 		assert func(t *testing.T, res *httptest.ResponseRecorder, logs []string)
 	}{
 		{
 			name: "app error",
-			setup: func(req *http.Request, blog *mock.MockblogService) {
-				blog.EXPECT().
-					GetArticles(gomock.Any(), gomock.Eq(&dto.GetArticlesIn{})).
+			setup: func(req *http.Request, articleSvc *mock.MockarticleService) {
+				articleSvc.EXPECT().
+					Get(gomock.Any(), gomock.Eq(&dto.GetArticlesIn{})).
 					Return(nil, errors.New("dummy error"))
 			},
 			assert: func(t *testing.T, res *httptest.ResponseRecorder, logs []string) {
@@ -47,13 +47,13 @@ func TestHandler(t *testing.T) {
 		},
 		{
 			name: "ok",
-			setup: func(req *http.Request, blog *mock.MockblogService) {
+			setup: func(req *http.Request, articleSvc *mock.MockarticleService) {
 				query := url.Values{}
 				query.Set("fromSlug", "foo")
 				req.URL.RawQuery = query.Encode()
 
-				blog.EXPECT().
-					GetArticles(gomock.Any(), gomock.Eq(&dto.GetArticlesIn{
+				articleSvc.EXPECT().
+					Get(gomock.Any(), gomock.Eq(&dto.GetArticlesIn{
 						FromSlug: pointer.To("foo"),
 					})).
 					Return(
@@ -91,13 +91,13 @@ func TestHandler(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			blog := mock.NewMockblogService(ctrl)
+			articleSvc := mock.NewMockarticleService(ctrl)
 			logger := testutil.NewLogger()
 			ctx, req, res := testutil.NewHTTPContext(ctrl)
 
-			tt.setup(req, blog)
+			tt.setup(req, articleSvc)
 
-			handler := NewHandler(blog, logger)
+			handler := NewHandler(articleSvc, logger)
 			handler.Handle(ctx)
 
 			tt.assert(t, res, logger.Logs())
